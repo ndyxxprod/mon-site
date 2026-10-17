@@ -15,10 +15,9 @@
    - timelineRange : (capture IMAGE seulement) où commence et où finit ton montage
                 sur la capture, de 0 (bord gauche) à 1 (bord droit).
                 Sert à placer la tête de lecture rouge au bon endroit. Ex. [0.12, 0.96]
-   - app      : logiciel qui ouvre le projet : 'resolve', 'ae', 'lr', 'ps' ou 'canva'
+   - app      : logiciel qui ouvre le projet : 'resolve', 'ae', 'lr' ou 'ps'
                 (par défaut : vidéo → DaVinci, motion → After Effects,
-                 photo → Lightroom, affiche → Photoshop,
-                 miniature / post / story → Canva).
+                 photo → Lightroom, graphisme → Photoshop).
    - cover    : image de couverture. Sans image, une affiche colorée est générée.
    - gallery  : liste d'images (photos, ou pages d'un design).
    - before   : (photos) image AVANT retouche — visible avec le bouton Avant/Après (Y|Y)
@@ -45,10 +44,9 @@ const CONFIG = {
        et colle l'adresse ici, ex. 'https://formspree.io/f/abcdwxyz'            */
   formEndpoint: '',
 
-  showreel: {
-    title: 'Showreel 2026', duration: '', video: '', cover: '',
-    colors: ['#ff5e3a', '#6a3dff']
-  },
+  /* Showreel : laisse null tant que tu n'en as pas (il n'apparaît alors nulle part).
+     Plus tard : showreel: { title: 'Showreel 2026', video: 'assets/videos/showreel.mp4' }, */
+  showreel: null,
 
   /* Réseaux : instagram, tiktok, youtube, linkedin, vimeo ou behance (logo officiel).
      Un réseau sans « url » n'est pas affiché. */
@@ -60,9 +58,9 @@ const CONFIG = {
   ],
 
   bio: [
-    "Étudiant en BUT MMI (parcours communication) à l'IUT de Blois, je développe mon activité de vidéaste freelance en parallèle de mes études.",
-    "Je réalise des contenus audiovisuels de la prise de vue au montage pour valoriser des événements, des projets et des marques : vidéos promotionnelles, couverture événementielle et contenus pour les réseaux sociaux.",
-    "À côté, je gère ma chaîne YouTube, je produis les vidéos du BDE MMI Mirage et je crée du contenu pour TikTok et Instagram."
+    "Passionné par les caméras depuis tout petit, j'ai toujours eu envie de tout capturer : les moments, les gens, les ambiances.",
+    "Aujourd'hui étudiant en BUT MMI (parcours communication) à l'IUT de Blois, je développe mon activité de vidéaste freelance en parallèle de mes études.",
+    "Je réalise des contenus audiovisuels de la prise de vue au montage pour valoriser des événements, des projets et des marques : vidéos promotionnelles, couverture événementielle et contenus pour les réseaux sociaux."
   ],
 
   languages: ['Français : courant', 'Malgache : langue maternelle', 'Anglais : B2'],
@@ -71,21 +69,15 @@ const CONFIG = {
     'Audiovisuel : création vidéo et photographie'
   ],
 
-  /* PHOTOS DE TOI AU TRAVAIL (posées sur le bureau + dossier « Coulisses »)
-     Mets tes photos dans assets/coulisses/ puis indique-les dans « photo ».
-     Tant que « photo » est vide, un emplacement « Photo à venir » s'affiche.
-     Tu peux en mettre autant que tu veux (6 maximum sont posées sur le bureau). */
-  coulisses: [
-    { photo: 'assets/coulisses/mariage.jpg', caption: 'Shooting d\'un mariage' },
-    { photo: 'assets/coulisses/tournage-clip.jpg', caption: 'Tournage d\'un clip' },
-    { photo: 'assets/coulisses/jamais-sans-camera.jpg', caption: 'Jamais sans ma caméra' }
-  ],
+  /* PHOTOS DE TOI AU TRAVAIL (facultatif) : posées sur le bureau + dossier « Coulisses ».
+     Vide = rien ne s'affiche. Ex. { photo: 'assets/coulisses/tournage.jpg', caption: 'En tournage' } */
+  coulisses: [],
 
   /* PRÉSENTATION (menu « Présentation » en haut de l'écran)
      Les diapositives sont générées à partir de tout le contenu de ce fichier. */
   presentation: {
     hello: 'Bonjour, moi c\'est',
-    pitch: 'Vidéos promotionnelles, couverture événementielle et contenus pour les réseaux sociaux — de la prise de vue au montage.',
+    pitch: 'Passionné par les caméras depuis tout petit, j\'aime tout capturer : de la prise de vue au montage.',
     services: [
       { icon: 'film', title: 'Vidéo promotionnelle', text: 'Des films pour valoriser une marque, un projet ou un lieu : tournage, montage, étalonnage.' },
       { icon: 'camera', title: 'Événementiel', text: 'Couverture vidéo et photo d\'événements : mariages, soirées, compétitions sportives.' },
@@ -95,30 +87,27 @@ const CONFIG = {
     closing: 'Un projet, un événement, une idée de vidéo ? Écris-moi, je réponds vite.'
   },
 
+  // Compétences : une simple liste (affichée sans jauge)
   skills: [
-    { label: 'Montage vidéo & postproduction', value: 92 },
-    { label: 'Tournage & prise de vue', value: 88 },
-    { label: 'Contenus pour les réseaux sociaux', value: 92 },
-    { label: 'Photographie événementielle', value: 82 },
-    { label: 'Storyboard & découpage', value: 80 },
-    { label: 'Motion design', value: 60 }
+    'Tournage et prise de vue',
+    'Montage vidéo et postproduction',
+    'Contenus pour les réseaux sociaux',
+    'Photographie événementielle',
+    'Storyboard et découpage'
   ],
+
+  /* Icônes d'applis en image (PNG carré, fond transparent, 512 px conseillé).
+     Ex. appIcons: { resolve: 'assets/icones/davinci-resolve.png' }
+     Clés : resolve, ae, lr, ps, finder, keynote, notes, mail, contacts, trash */
+  appIcons: {},
 
   // Les vrais logos s'affichent automatiquement pour ces logiciels
   tools: ['DaVinci Resolve', 'After Effects', 'CapCut Pro', 'Photoshop', 'Lightroom', 'Illustrator', 'Canva'],
 
-  gear: [
-    'Boîtier hybride Canon et objectif RF série L',
-    'Stabilisateur DJI Ronin',
-    'Magic arm',
-    'Trépied'
-  ],
-
+  // Parcours (le stage et le bac restent seulement sur le CV)
   path: [
-    { year: '2026', title: 'Stage — SUAPS, Université de Tours', text: 'Production de contenus audiovisuels pour les réseaux, participation à la conception des futurs contenus et création de la charte graphique 2026-2027.' },
     { year: '2025', title: 'Vidéaste indépendant', text: 'Conception et montage de vidéos professionnelles et personnelles, création de contenus pour YouTube et les réseaux sociaux.' },
-    { year: '2024', title: 'BUT MMI — IUT de Blois', text: 'Métiers du Multimédia et de l\'Internet, parcours communication (3e année, 2024-2027). Projets vidéo : court-métrage, clip musical, vidéo commerciale.' },
-    { year: '2024', title: 'Baccalauréat — École BIRD (AEFE), Madagascar', text: 'Baccalauréat général français, mention bien.' }
+    { year: '2024', title: 'BUT MMI — IUT de Blois', text: 'Métiers du Multimédia et de l\'Internet, parcours communication (3e année, 2024-2027). Projets vidéo : court-métrage, clip musical, vidéo commerciale.' }
   ],
 
   /* STORYBOARDS (app Notes → dossier « Storyboards »)
@@ -153,9 +142,9 @@ const CONFIG = {
       ]
     },
     {
-      id: 'sb-basket', title: 'Storyboard Basket', project: 'basket', date: '2025',
+      id: 'sb-basket', title: 'Storyboard Basket', date: '2025',   // film pas encore tourné : pas de lien vers une vidéo
       pages: ['assets/storyboards/basket-planche.jpg'],
-      description: "18 plans pour un film de basket autour de Yanis : arrivée sur le terrain, échauffement, crossover, dunk et tir à trois points, avec les images de référence de chaque plan.",
+      description: "Film à venir — 18 plans pour un film de basket autour de Yanis : arrivée sur le terrain, échauffement, crossover, dunk et tir à trois points, avec les images de référence de chaque plan.",
       frames: [
         { image: 'assets/storyboards/basket-01.jpg', shot: 'Plan 1', framing: 'Plan de dos', move: 'Mouvement gauche → droite', text: "Yanis arrive sur le terrain, la balle dans les mains." },
         { image: 'assets/storyboards/basket-02.jpg', shot: 'Plan 2', framing: 'Plan de face', move: 'Mouvement vers la gauche', text: "Yanis s'avance vers le terrain ; la caméra glisse pour se retrouver face à lui." },
@@ -185,12 +174,6 @@ const CONFIG = {
       tags: ['Clip', 'Musique', 'Projet d\'équipe'], tools: ['DaVinci Resolve'], fav: true,
       video: '', timeline: '', colors: ['#3a1c71', '#d76d77'] },
 
-    { id: 'basket', title: 'Film basket — Yanis', short: 'Basket', category: 'scolaire', type: 'video',
-      client: 'Projet vidéo sportif', year: '2025', role: 'Storyboard, tournage, montage', duration: '',
-      description: "Un film sportif autour de Yanis sur un terrain de basket : arrivée sur le terrain, échauffement, crossover filmé en low shutter speed, dunk en contre-plongée et tir à trois points. Découpage de 18 plans préparé en storyboard.",
-      tags: ['Sport', 'Basket', 'Storyboard'], tools: ['DaVinci Resolve', 'After Effects'], fav: true,
-      video: '', timeline: '', colors: ['#f7971e', '#c0392b'] },
-
     { id: 'mariage', title: 'Mariage', short: 'Mariage', category: 'pro', type: 'photo',
       client: 'Particuliers', year: '2025', role: 'Photographie, retouche', duration: '',
       description: "Couverture d'un mariage : les préparatifs, les invités et les moments forts de la journée, puis tri et retouche de la série dans Lightroom.",
@@ -198,16 +181,10 @@ const CONFIG = {
       cover: '', gallery: [], before: '', colors: ['#c79081', '#dfa579'] },
 
     { id: 'suaps', title: 'Contenus réseaux — SUAPS', short: 'SUAPS', category: 'pro', type: 'video',
-      client: 'SUAPS — Université de Tours', year: '2026', role: 'Stage : tournage, montage', duration: '',
-      description: "Pendant mon stage de 2e année au service des sports de l'Université de Tours : production de contenus audiovisuels pour les réseaux sociaux et participation à la conception des futurs contenus.",
-      tags: ['Stage', 'Sport', 'Réseaux sociaux'], tools: ['DaVinci Resolve', 'CapCut Pro'], fav: true,
+      client: 'SUAPS — Université de Tours', year: '2026', role: 'Tournage, montage', duration: '',
+      description: "Contenus audiovisuels pour les réseaux sociaux du service des sports de l'Université de Tours.",
+      tags: ['Sport', 'Réseaux sociaux'], tools: ['DaVinci Resolve', 'CapCut Pro'], fav: true,
       video: '', timeline: '', cover: '', colors: ['#00c6ff', '#0050d0'] },
-
-    { id: 'charte-suaps', title: 'Charte graphique SUAPS 2026-2027', short: 'Charte SUAPS', category: 'pro', type: 'design', format: 'post',
-      client: 'SUAPS — Université de Tours', year: '2026', role: 'Graphisme', duration: '',
-      description: "Création de la charte graphique du SUAPS pour l'année 2026-2027 : couleurs, typographies et gabarits pour les réseaux.",
-      tags: ['Charte graphique', 'Réseaux sociaux'], tools: ['Canva', 'Photoshop'],
-      cover: '', gallery: [], colors: ['#11998e', '#38ef7d'] },
 
     { id: 'bde-mirage', title: 'Vidéos du BDE MMI Mirage', short: 'BDE Mirage', category: 'scolaire', type: 'video',
       client: 'BDE MMI Mirage', year: '2025', role: 'Producteur de contenu vidéo', duration: '',

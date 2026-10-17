@@ -21,7 +21,7 @@ PORTFOLIO macOS — mode d'emploi
    logos.js     vrais logos des logiciels et icônes d'apps
    core.js      bureau, fenêtres, Dock, menus, widgets
    apps.js      les applications (Finder, DaVinci Resolve, After Effects,
-                Lightroom, Photoshop, Canva, Mail, Contacts, Notes, Keynote)
+                Lightroom, Photoshop, Mail, Contacts, Notes, Keynote)
    style.css / apps.css   l'apparence
    assets/      tes vidéos, captures de timeline, photos, storyboards, avatar, CV
                 (cv.pdf + cv-1.jpg, cv-2.jpg : les pages affichées dans l'aperçu du CV)
@@ -52,18 +52,19 @@ PORTFOLIO macOS — mode d'emploi
        et coupe la capture pour qu'elle commence et finisse comme la vidéo.
    Le logiciel qui ouvre le projet : app: 'resolve' ou 'ae'
    (par défaut : vidéo → DaVinci Resolve, motion → After Effects).
-   Pour les autres projets : app: 'lr' (Lightroom), 'ps' (Photoshop) ou 'canva'.
+   Pour les autres projets : app: 'lr' (Lightroom) ou 'ps' (Photoshop).
    Sans vidéo ni capture, un aperçu et une timeline réalistes sont générés.
 
-5. LIGHTROOM, PHOTOSHOP ET CANVA
+5. LIGHTROOM ET PHOTOSHOP
    - Photos (type 'photo') → Lightroom :
        gallery: ['assets/photos/serie-01.jpg', …]   (une photo = une vignette de la pellicule, chaque projet = un album)
      Option avant/après : before: ['assets/photos/serie-01-avant.jpg', …]
      → bouton Avant/Après en bas à droite (ou touche \) pour comparer.
      Les curseurs (exposition, contraste, balance des blancs…) et les paramètres
      prédéfinis fonctionnent pour de vrai sur l'image.
-   - Affiches (type 'design', format 'affiche') → Photoshop : cover ou gallery.
-   - Miniatures, posts, stories (type 'design') → Canva : chaque image = une page.
+   - Graphismes (type 'design') → Photoshop : cover ou gallery.
+   - Icônes d'applis : pour utiliser la vraie icône d'une appli, mets un PNG dans
+     assets/icones/ et indique-le dans config.js → appIcons.
 
 6. STORYBOARDS (app Notes)
    Dans config.js → storyboards :
@@ -81,7 +82,7 @@ PORTFOLIO macOS — mode d'emploi
    l'envoyer lui-même : crée un formulaire gratuit sur https://formspree.io
    et colle son adresse dans config.js → formEndpoint.
 
-9. TES PHOTOS DE TOURNAGE (« Coulisses »)
+9. TES PHOTOS DE TOURNAGE (« Coulisses », facultatif — vide pour l'instant)
    Des photos de toi en train de travailler sont posées sur le bureau comme des
    polaroïds (on peut les déplacer) et rangées dans le dossier « Coulisses ».
    Mets-les dans assets/coulisses/ puis dans config.js → coulisses :

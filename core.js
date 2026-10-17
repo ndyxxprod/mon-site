@@ -155,18 +155,20 @@ const TYPE = {
   video:  { label: 'Vidéo', ext: 'mov', glyph: 'film', app: 'resolve', color: '#ff9f0a' },
   motion: { label: 'Motion design', ext: 'aep', glyph: 'sparkle', app: 'ae', color: '#bf5af2' },
   photo:  { label: 'Photo', ext: 'jpg', glyph: 'camera', app: 'lr', color: '#30d158' },
-  design: { label: 'Graphisme', ext: 'png', glyph: 'palette', app: 'canva', color: '#0a84ff' }
+  design: { label: 'Graphisme', ext: 'psd', glyph: 'palette', app: 'ps', color: '#0a84ff' }
 };
 const CAT = { pro: 'Professionnel', scolaire: 'Scolaire', reel: 'Showreel' };
 const FMT = { affiche: 'Affiche', miniature: 'Miniature', post: 'Post', story: 'Story' };
 const slug = s => norm(s).replace(/[«»"']/g, '').replace(/—/g, '-').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-// logiciel qui ouvre le projet : affiches → Photoshop, autres graphismes → Canva
-const appFor = p => p.app || (p.type === 'design' && (p.format || 'affiche') === 'affiche' ? 'ps' : TYPE[p.type].app);
+// logiciel qui ouvre le projet (graphismes → Photoshop) ; app: '…' dans config.js pour forcer
+const appFor = p => p.app || TYPE[p.type].app;
 const extFor = p => p.type === 'design' && appFor(p) === 'ps' ? 'psd' : TYPE[p.type].ext;
 const fileName = p => p.file || `${ucfirst(slug(p.short || p.title))}.${extFor(p)}`;
 CONFIG.socials = (CONFIG.socials || []).filter(s => s.url);
-const REEL = Object.assign({ id: 'showreel', short: 'Showreel', category: 'reel', type: 'video', client: CONFIG.name, year: '2026', role: 'Réalisation, montage, étalonnage', description: "Une sélection de mes meilleurs plans : clips, événements, sport et contenus pour les réseaux.", tags: ['Showreel'], tools: ['DaVinci Resolve', 'After Effects'], file: 'Showreel.mov', timeline: '' }, CONFIG.showreel);
+const HAS_REEL = !!(CONFIG.showreel && CONFIG.showreel.video);   // sans vidéo de showreel, il n'apparaît nulle part
+const REEL = Object.assign({ id: 'showreel', short: 'Showreel', category: 'reel', type: 'video', client: CONFIG.name, year: '2026', role: 'Réalisation, montage, étalonnage', description: "Une sélection de mes meilleurs plans : clips, événements, sport et contenus pour les réseaux.", tags: ['Showreel'], tools: ['DaVinci Resolve', 'After Effects'], file: 'Showreel.mov', timeline: '' }, CONFIG.showreel || {});
 const byId = id => id === 'showreel' ? REEL : CONFIG.projects.find(p => p.id === id);
+const skillLabel = s => typeof s === 'string' ? s : s.label;   // compétences : simple liste (pas de jauge)
 const coverOf = p => p.cover || asList(p.gallery)[0] || '';
 
 /* ---------- Affiches générées (projets sans image) ---------- */
@@ -268,7 +270,7 @@ const MENUS = {
   ],
   file: () => [
     { label: 'Nouvelle fenêtre Finder', action: () => openFolder('all', null, true) },
-    { label: 'Ouvrir le showreel', action: () => openShowreel() },
+    ...(HAS_REEL ? [{ label: 'Ouvrir le showreel', action: () => openShowreel() }] : []),
     { label: 'Ouvrir les storyboards', action: () => openNotes('folder:storyboards') },
     { label: 'Voir le CV', action: () => openCV() },
     '-',
@@ -371,7 +373,7 @@ function buildCC() {
     </div>
     <div class="cc-tile cc-slider"><b>Luminosité</b><label class="slider">${G.sun}<input type="range" min="35" max="100" value="100" data-cc="bright" aria-label="Luminosité"></label></div>
     <div class="cc-tile cc-wp"><b>Fond d'écran</b><div class="cc-swatches">${Object.entries(WALLPAPERS).map(([k, l]) => `<button class="sw sw-${k}" data-wp="${k}" aria-label="${l}"><span>${l}</span></button>`).join('')}</div></div>
-    <div class="cc-tile cc-now"><div class="cc-art">${poster(REEL, { label: false })}</div><div class="cc-nowt"><b>${esc(REEL.title)}</b><small>${esc(CONFIG.name)}</small></div><button class="cc-play" data-cc="reel" aria-label="Lire le showreel">${G.play}</button></div>
+    ${HAS_REEL ? `<div class="cc-tile cc-now"><div class="cc-art">${poster(REEL, { label: false })}</div><div class="cc-nowt"><b>${esc(REEL.title)}</b><small>${esc(CONFIG.name)}</small></div><button class="cc-play" data-cc="reel" aria-label="Lire le showreel">${G.play}</button></div>` : ''}
   </div>`);
   $('#desktop').append(cc);
   cc.addEventListener('click', e => {
@@ -590,7 +592,7 @@ const APPS = {
   contacts: { name: 'Contacts', icon: 'contacts', open: from => openContact(from) },
   trash:    { name: 'Corbeille', icon: 'trash', open: from => openTrash(from) }
 };
-const DOCK = ['finder', 'keynote', '|', 'resolve', 'ae', 'lr', 'ps', 'canva', '|', 'notes', 'mail', 'contacts', '|', 'trash'];
+const DOCK = ['finder', 'keynote', '|', 'resolve', 'ae', 'lr', 'ps', '|', 'notes', 'mail', 'contacts', '|', 'trash'];
 
 function dockItem(app) { return $(`.dock-item[data-app="${app}"]`); }
 function dockRect(app) {
@@ -685,12 +687,12 @@ const DESK = [
   { id: 'photos', label: 'Photos', icon: 'folderPhoto', open: f => openFolder('photo', f), has: p => p.type === 'photo' },
   { id: 'motion', label: 'Motion design', icon: 'folderMotion', open: f => openFolder('motion', f), has: p => p.type === 'motion' },
   { id: 'story', label: 'Storyboards', icon: 'folderStory', open: f => openNotes('folder:storyboards', f) },
-  { id: 'coul', label: 'Coulisses', icon: 'folderClap', open: f => openCoulisses(0, f) },
-  { id: 'reel', label: 'Showreel.mov', icon: 'mov', open: f => openShowreel(f) },
+  { id: 'coul', label: 'Coulisses', icon: 'folderClap', open: f => openCoulisses(0, f), when: (CONFIG.coulisses || []).some(c => c && c.photo) },
+  { id: 'reel', label: 'Showreel.mov', icon: 'mov', open: f => openShowreel(f), when: HAS_REEL },
   { id: 'pres', label: 'Présentation.key', icon: 'key', open: f => openPresentation(f) },
   { id: 'cv', label: 'CV.pdf', icon: 'pdf', open: f => openCV(f) },
   { id: 'contact', label: 'Contact.vcf', icon: 'vcf', open: f => openContact(f) }
-].filter(d => !d.has || CONFIG.projects.some(d.has));   // un dossier vide n'est pas posé sur le bureau
+].filter(d => d.when !== false && (!d.has || CONFIG.projects.some(d.has)));   // un dossier vide n'est pas posé sur le bureau
 function buildDesk() {
   const wrap = $('#deskIcons');
   wrap.innerHTML = '';
@@ -724,13 +726,13 @@ function buildDesk() {
 function layoutDesk(force) {
   const mob = isMobile();
   const top = mob ? (($('#widgets') || {}).offsetHeight || 0) + 14 : 10;
-  const perCol = Math.max(1, Math.floor((innerHeight - MB - 110 - top) / 100));
+  const perCol = Math.max(1, Math.floor((innerHeight - MB - 110 - top) / 122));
   const cols = Math.max(1, Math.floor((innerWidth - 12) / 86));
   DESK.forEach((d, i) => {
     if (d.moved && !mob && !force) return;
     let x, y;
     if (mob) { x = 6 + (i % cols) * 86; y = top + Math.floor(i / cols) * 98; }
-    else { const col = Math.floor(i / perCol), row = i % perCol; x = innerWidth - 122 - col * 110; y = top + row * 100; }
+    else { const col = Math.floor(i / perCol), row = i % perCol; x = innerWidth - 154 - col * 146; y = top + row * 122; }
     d.el.style.left = x + 'px'; d.el.style.top = y + 'px';
   });
 }
@@ -914,9 +916,9 @@ function spotItems() {
     { label: 'Présentation', sub: 'Qui je suis — Keynote', app: 'keynote', key: 'presentation a propos qui moi bio', run: () => openPresentation() },
     { label: 'Contact', sub: 'Me contacter', app: 'contacts', key: 'contact email message mail ecrire', run: () => openContact() },
     ...CONFIG.projects.map(p => ({ label: p.title, sub: `${TYPE[p.type].label} · ${CAT[p.category]} · ${p.year}`, app: appFor(p), key: `${p.title} ${p.client} ${(p.tags || []).join(' ')} ${p.type} ${p.category}`, run: () => openProject(p) })),
-    { label: 'Showreel', sub: 'Vidéo', ic: 'film', key: 'showreel bande demo', run: () => openShowreel() },
+    ...(HAS_REEL ? [{ label: 'Showreel', sub: 'Vidéo', ic: 'film', key: 'showreel bande demo', run: () => openShowreel() }] : []),
     ...(CONFIG.storyboards || []).map(s => ({ label: s.title, sub: 'Storyboard · Notes', app: 'notes', key: `storyboard ${s.title}`, run: () => openNotes('sb:' + s.id) })),
-    ...['resolve', 'ae', 'lr', 'ps', 'canva', 'notes', 'mail'].map(a => ({ label: APPS[a].name, sub: 'Application', app: a, key: APPS[a].name, run: () => launch(a) })),
+    ...['resolve', 'ae', 'lr', 'ps', 'notes', 'mail'].map(a => ({ label: APPS[a].name, sub: 'Application', app: a, key: APPS[a].name, run: () => launch(a) })),
     ...Object.entries(FOLDERS).map(([k, f]) => ({ label: f.label, sub: 'Dossier', ic: f.icon, key: f.label + ' dossier', run: () => openFolder(k) })),
     { label: 'CV', sub: 'Document PDF', ic: 'doc', key: 'cv curriculum', run: () => openCV() },
     { label: 'À propos de ce portfolio', sub: 'Infos', ic: 'info', key: 'a propos portfolio', run: () => openAbout() }

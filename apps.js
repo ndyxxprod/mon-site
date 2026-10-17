@@ -46,7 +46,7 @@ function renderFinder(body, rec) {
       <nav class="fd-side-scroll">
         ${SIDEBAR.map(([hd, ks]) => `<div class="fd-h">${hd}</div>${ks.map(k => `<button class="fd-link" data-v="${k}"><span class="fd-i">${G[FOLDERS[k].icon]}</span><span class="fd-l">${FOLDERS[k].label}</span></button>`).join('')}`).join('')}
         <div class="fd-h">Applications</div>
-        ${['keynote', 'resolve', 'ae', 'lr', 'ps', 'canva'].map(a => `<button class="fd-link" data-app="${a}"><span class="fd-i app">${icon(APPS[a].icon)}</span><span class="fd-l">${a === 'keynote' ? 'Présentation' : APPS[a].name}</span></button>`).join('')}
+        ${['keynote', 'resolve', 'ae', 'lr', 'ps'].map(a => `<button class="fd-link" data-app="${a}"><span class="fd-i app">${icon(APPS[a].icon)}</span><span class="fd-l">${a === 'keynote' ? 'Présentation' : APPS[a].name}</span></button>`).join('')}
         <div class="fd-h">Tags</div>
         <button class="fd-link" data-v="pro"><i class="fd-tag" style="background:#ff9f0a"></i><span class="fd-l">Pro</span></button>
         <button class="fd-link" data-v="scolaire"><i class="fd-tag" style="background:#0a84ff"></i><span class="fd-l">Scolaire</span></button>
@@ -342,7 +342,7 @@ const RVI = {
   monitor: si('<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M9 19h6"/>')
 };
 const RV_PAGES = [['media', 'Média'], ['cut', 'Cut'], ['edit', 'Montage'], ['fusion', 'Fusion'], ['color', 'Étalonnage'], ['fairlight', 'Fairlight'], ['deliver', 'Exportation']];
-const resolveList = () => [REEL, ...CONFIG.projects.filter(x => appFor(x) === 'resolve')];
+const resolveList = () => [...(HAS_REEL ? [REEL] : []), ...CONFIG.projects.filter(x => appFor(x) === 'resolve')];
 const rvTC = s => tc(3600 + s);
 
 function openResolve(p, from) {
@@ -874,7 +874,7 @@ const LR_PRESETS = [
   ['Noir et blanc', [['N&B contrasté', { bw: true, con: 42, cla: 22, bl: -20 }], ['N&B doux', { bw: true, con: -12, sh: 25 }]]]
 ];
 const LR_LABEL = Object.fromEntries(LR_GROUPS.flatMap(g => g[1].map(s => [s[0], s[1]])));
-const lrList = () => { const l = CONFIG.projects.filter(x => appFor(x) === 'lr'); return l.length ? l : CONFIG.projects.filter(x => x.type === 'photo'); };
+const lrList = () => { const l = CONFIG.projects.filter(x => appFor(x) === 'lr'); if (l.length) return l; const ph = CONFIG.projects.filter(x => x.type === 'photo'); return ph.length ? ph : CONFIG.projects.slice(0, 1); };
 const lrImages = p => { const g = asList(p.gallery); return g.length ? g : p.cover ? [p.cover] : [null, null, null, null, null, null]; };
 const lrFmt = (k, v) => k === 'exp' ? (v > 0 ? '+' : '') + v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : (v > 0 ? '+' : '') + v;
 function lrFilter(a) {
@@ -1132,7 +1132,8 @@ const PSI = {
   newl: si('<rect x="5" y="5" width="14" height="14" rx="1.5"/><path d="M12 9v6M9 12h6"/>'),
   ws: si('<rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M14 5v14"/>')
 };
-const psList = () => { const l = CONFIG.projects.filter(x => appFor(x) === 'ps'); return l.length ? l : CONFIG.projects.filter(x => x.type === 'design').slice(0, 2); };
+// sans graphisme, Photoshop ouvre les photos (retouche)
+const psList = () => { const l = CONFIG.projects.filter(x => appFor(x) === 'ps'); if (l.length) return l; const ph = CONFIG.projects.filter(x => x.type === 'photo'); return ph.length ? ph.slice(0, 3) : CONFIG.projects.slice(0, 1); };
 const psPoster = p => p.type !== 'photo';
 const psImages = p => { const g = asList(p.gallery); return g.length ? g : p.cover ? [p.cover] : psPoster(p) ? [null] : [null, null, null, null]; };
 
@@ -1503,13 +1504,13 @@ function inboxMessages() {
       prev: `Merci de passer ! Pour me contacter, réponds simplement à ce message.`,
       body: `<p>Bonjour,</p><p>Merci de passer sur mon portfolio ! Je suis ${esc(CONFIG.role.toLowerCase())}, basé à ${esc(CONFIG.city)}.</p><p>Pour découvrir qui je suis, ouvre la ${pres} (en haut de l'écran). Mes projets sont dans le Finder et sur le bureau, et mes storyboards dans Notes.</p><p><b>Pour me contacter</b>, clique sur « Répondre » ou sur le bouton ci-dessous : ton message m'arrivera directement.</p><p>À très vite,<br>${esc(firstName())}</p>`,
       cta: [['reply', 'Écrire à ' + firstName()], ['pres', 'Voir la présentation']] },
-    { id: 'm2', subject: `${REEL.title} — à voir en premier`, time: 'Hier',
+    ...(HAS_REEL ? [{ id: 'm2', subject: `${REEL.title} — à voir en premier`, time: 'Hier',
       prev: `Mes meilleurs plans en un seul montage : clips, événements, sport, réseaux sociaux…`,
       body: `<p>Si tu n'as qu'une minute, commence par mon showreel : une sélection de mes meilleurs plans, montés et étalonnés sur DaVinci Resolve.</p><p>Il s'ouvre directement dans le logiciel, avec la timeline du montage.</p>`,
-      cta: [['reel', 'Lire le showreel'], ['reply', 'Répondre']] },
+      cta: [['reel', 'Lire le showreel'], ['reply', 'Répondre']] }] : []),
     { id: 'm3', subject: 'Mes disponibilités', time: 'Lundi',
       prev: CONFIG.status,
-      body: `<p>${esc(CONFIG.status)}.</p><p>Tournage, montage, motion design, photo ou storyboard : décris-moi ton projet, je te réponds avec un devis et un planning.</p>`,
+      body: `<p>${esc(CONFIG.status)}.</p><p>Tournage, montage, photo ou storyboard : décris-moi ton projet, je te réponds avec un devis et un planning.</p>`,
       cta: [['reply', 'Proposer un projet'], ['cv', 'Voir mon CV']] }
   ];
 }
@@ -1521,7 +1522,6 @@ function openMail(from) {
         <aside class="ml-side"><div class="ml-side-top" data-drag><div class="tl-slot"></div></div>
           <div class="ml-h">Favoris</div>
           <button class="ml-box on" data-box="inbox">${G.inbox}<span>Réception</span><em class="ml-badge">1</em></button>
-          <button class="ml-box" data-box="vip">${G.star}<span>VIP</span></button>
           <button class="ml-box" data-box="sent">${G.sentBox}<span>Envoyés</span><em class="ml-scount"></em></button>
           <div class="ml-h">iCloud</div>
           <button class="ml-box" data-box="inbox">${G.inbox}<span>Réception</span></button>
@@ -1616,23 +1616,15 @@ function openCompose(o = {}, from) {
 }
 
 /* ==================================================================
-   NOTES (à propos + storyboards)
+   NOTES (storyboards)
    ================================================================== */
 function notesData() {
-  const sb = CONFIG.storyboards || [];
-  const about = [
-    { id: 'bio', folder: 'notes', title: 'À propos de moi', prev: CONFIG.bio[0], date: 'Aujourd\'hui' },
-    { id: 'skills', folder: 'notes', title: 'Compétences', prev: CONFIG.skills.map(s => s.label).join(', '), date: 'Aujourd\'hui' },
-    { id: 'path', folder: 'notes', title: 'Parcours', prev: CONFIG.path.map(p => p.title).join(' · '), date: 'Hier' },
-    { id: 'gear', folder: 'notes', title: 'Matériel', prev: CONFIG.gear.join(', '), date: 'Hier' }
-  ];
-  const boards = sb.map(s => ({ id: 'sb:' + s.id, folder: 'storyboards', title: s.title, prev: s.description, date: s.date || '', sb: s }));
-  return [...boards, ...about];
+  return (CONFIG.storyboards || []).map(s => ({ id: 'sb:' + s.id, folder: 'storyboards', title: s.title, prev: s.description, date: s.date || '', sb: s }));
 }
-const NOTE_FOLDERS = [['all', 'Toutes les notes iCloud'], ['notes', 'Notes'], ['storyboards', 'Storyboards']];
+const NOTE_FOLDERS = [['all', 'Toutes les notes iCloud'], ['storyboards', 'Storyboards']];
 
 function openNotes(target, from) {
-  target = target || 'bio';
+  target = target || 'folder:storyboards';
   const apply = rec => {
     if (target.startsWith('folder:')) { rec.state.folder = target.slice(7); rec.state.sel = null; }
     else { rec.state.sel = target; const n = notesData().find(x => x.id === target); if (n && rec.state.folder !== 'all' && rec.state.folder !== n.folder) rec.state.folder = n.folder; }
@@ -1658,7 +1650,7 @@ function openNotes(target, from) {
           <article class="nt-body"></article>
           <div class="sb-lb hidden"></div>
         </section></div>`;
-      rec.state = { folder: 'notes', sel: null, lb: null };
+      rec.state = { folder: 'storyboards', sel: null, lb: null };
       body.addEventListener('click', e => {
         const f = e.target.closest('[data-f]'); if (f) { rec.state.folder = f.dataset.f; rec.state.sel = null; renderNotes(rec); return; }
         const it = e.target.closest('.nt-it'); if (it) { rec.state.sel = it.dataset.id; renderNotes(rec); return; }
@@ -1689,19 +1681,8 @@ function renderNotes(rec) {
   const doc = $('.nt-body', body);
   closeLightbox(rec);
   const date = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  doc.innerHTML = n ? `<div class="n-date">${date}</div>${n.sb ? storyboardHTML(n.sb) : noteHTML(n.id)}` : '<p class="n-muted">Aucune note</p>';
+  doc.innerHTML = n ? `<div class="n-date">${date}</div>${storyboardHTML(n.sb)}` : '<p class="n-muted">Aucune note</p>';
   doc.scrollTop = 0;
-  $$('.sk b', doc).forEach(b => {
-    const v = +b.dataset.v, t0 = performance.now();
-    const step = now => { const k = Math.min(1, (now - t0) / 900); b.textContent = Math.round(v * (1 - Math.pow(1 - k, 3))) + ' %'; if (k < 1) requestAnimationFrame(step); };
-    requestAnimationFrame(step);
-  });
-}
-function noteHTML(id) {
-  if (id === 'bio') return `<div class="n-hero"><span class="n-av">${avatarHTML()}</span><div><h1>${esc(CONFIG.name)}</h1><p>${esc(CONFIG.role)} · ${esc(CONFIG.city)}</p></div></div>${CONFIG.bio.map(t => `<p>${esc(t)}</p>`).join('')}<h3>Logiciels</h3><div class="n-tools">${CONFIG.tools.map(t => `<span><i>${toolLogo(t)}</i>${esc(t)}</span>`).join('')}</div>${asList(CONFIG.languages).length ? `<h3>Langues</h3><ul class="n-list">${asList(CONFIG.languages).map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}${asList(CONFIG.interests).length ? `<h3>Centres d'intérêt</h3><ul class="n-list">${asList(CONFIG.interests).map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}`;
-  if (id === 'skills') return `<h1>Compétences</h1><p class="n-muted">Ce que je fais au quotidien, du storyboard à l'export.</p><div class="sk-list">${CONFIG.skills.map((s, i) => `<div class="sk"><span>${esc(s.label)}</span><b class="mono" data-v="${s.value}">0 %</b><div class="sk-bar"><i style="--w:${s.value}%;animation-delay:${i * 80}ms"></i></div></div>`).join('')}</div>`;
-  if (id === 'path') return `<h1>Parcours</h1><div class="n-tl">${CONFIG.path.map(p => `<div class="n-step"><span class="mono">${esc(p.year)}</span><div><b>${esc(p.title)}</b><p>${esc(p.text)}</p></div></div>`).join('')}</div>`;
-  return `<h1>Matériel</h1><ul class="n-check">${CONFIG.gear.map(g => `<li><i>${G.check}</i>${esc(g)}</li>`).join('')}</ul>`;
 }
 /* esquisse au crayon générée quand une case de storyboard n'a pas d'image */
 function sketchSVG(seed, fr = {}) {
@@ -1775,8 +1756,7 @@ function slidesData() {
         <div class="ks-stats"><div><b>${CONFIG.projects.length}</b><span>projets</span></div><div><b>${clients}</b><span>clients pro</span></div><div><b>${years || 1}</b><span>an${years > 1 ? 's' : ''} d'expérience</span></div></div></div></div>` },
     { t: 'Ce que je fais', html: `<div class="ks ks-serv">${head(2, 'Ce que je fais')}<div class="ks-cards">${(P.services || []).map(s => `<div class="ks-card"><span class="ks-ci">${G[s.icon] || G.sparkle}</span><b>${esc(s.title)}</b><p>${esc(s.text)}</p></div>`).join('')}</div></div>` },
     { t: 'Mes logiciels', html: `<div class="ks ks-tools">${head(3, 'Mes logiciels')}<div class="ks-logos">${CONFIG.tools.map(t => `<div class="ks-logo"><i>${toolLogo(t)}</i><span>${esc(t)}</span></div>`).join('')}</div></div>` },
-    { t: 'Compétences', html: `<div class="ks ks-skills">${head(4, 'Compétences & matériel')}<div class="ks-cols"><div class="ks-bars">${CONFIG.skills.map(s => `<div class="ks-bar"><span>${esc(s.label)}<b>${s.value} %</b></span><i><u style="width:${s.value}%"></u></i></div>`).join('')}</div>
-        <ul class="ks-gear">${CONFIG.gear.map(g => `<li>${G.check}${esc(g)}</li>`).join('')}</ul></div></div>` },
+    { t: 'Compétences', html: `<div class="ks ks-skills">${head(4, 'Compétences')}<div class="ks-skl">${CONFIG.skills.map(s => `<div class="ks-sk"><span class="ks-ski">${G.check}</span><b>${esc(skillLabel(s))}</b></div>`).join('')}</div></div>` },
     { t: 'Parcours', html: `<div class="ks ks-path">${head(5, 'Parcours')}<div class="ks-tl">${CONFIG.path.slice().reverse().map(p => `<div class="ks-step"><b>${esc(p.year)}</b><i></i><strong>${esc(p.title)}</strong><p>${esc(p.text)}</p></div>`).join('')}</div></div>` },
     { t: 'Projets phares', html: `<div class="ks ks-proj">${head(6, 'Projets phares')}<div class="ks-pgrid">${favs.map(p => `<button class="ks-pc" data-open="${p.id}"><div class="ks-pth">${poster(p)}</div><b>${esc(p.title)}</b><small>${esc(p.client)} · ${esc(p.year)} · ${esc(APPS[appFor(p)].name)}</small></button>`).join('')}</div><p class="ks-hint">Clique sur un projet pour l'ouvrir dans son logiciel.</p></div>` },
     { t: 'Storyboards', html: `<div class="ks ks-sb">${head(7, 'De l\'idée à l\'image')}<p class="ks-lead">Chaque tournage commence par un storyboard : découpage, cadrages, mouvements de caméra.</p>
@@ -1971,8 +1951,8 @@ function openCV(from) {
         <section><h4>Profil</h4><p>${esc(CONFIG.bio[0])} ${esc(CONFIG.bio[1] || '')}</p></section>
         <section><h4>Expériences & formation</h4>${CONFIG.path.map(p => `<div class="cv-x"><span>${esc(p.year)}</span><div><b>${esc(p.title)}</b><p>${esc(p.text)}</p></div></div>`).join('')}</section>
         <div class="cv-cols">
-          <section><h4>Compétences</h4>${CONFIG.skills.map(s => `<div class="cv-sk"><span>${esc(s.label)}</span><i><b style="width:${s.value}%"></b></i></div>`).join('')}</section>
-          <section><h4>Logiciels</h4><div class="cv-tools">${CONFIG.tools.map(t => `<span><i>${toolLogo(t)}</i>${esc(t)}</span>`).join('')}</div><h4>Matériel</h4><ul>${CONFIG.gear.slice(0, 4).map(g => `<li>${esc(g)}</li>`).join('')}</ul></section>
+          <section><h4>Compétences</h4><ul>${CONFIG.skills.map(s => `<li>${esc(skillLabel(s))}</li>`).join('')}</ul></section>
+          <section><h4>Logiciels</h4><div class="cv-tools">${CONFIG.tools.map(t => `<span><i>${toolLogo(t)}</i>${esc(t)}</span>`).join('')}</div>${asList(CONFIG.gear).length ? `<h4>Matériel</h4><ul>${asList(CONFIG.gear).slice(0, 4).map(g => `<li>${esc(g)}</li>`).join('')}</ul>` : ''}</section>
         </div>
         <section><h4>Projets marquants</h4><ul class="cv-pj">${CONFIG.projects.filter(p => p.fav).map(p => `<li><b>${esc(p.title)}</b> — ${esc(p.client)}, ${esc(p.year)}</li>`).join('')}</ul></section>
       </div></div></div>`}`;

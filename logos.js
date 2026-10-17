@@ -166,7 +166,11 @@ Object.assign(ICONS, {
   folderClap: u => folderSvg(u, GLYPH_PATHS.clap),
   mov: u => docSvg(u, 'mov'), txt: u => docSvg(u, 'txt'), pdf: u => docSvg(u, 'pdf'), vcf: u => docSvg(u, 'vcf'), key: u => docSvg(u, 'key')
 });
-const icon = name => (ICONS[name] || ICONS.folder)(uid());
+// Icône d'app fournie en PNG (config.js → appIcons) : prioritaire sur le dessin vectoriel
+const icon = name => {
+  const png = typeof CONFIG !== 'undefined' && CONFIG.appIcons && CONFIG.appIcons[name];
+  return png ? `<img class="app-png" src="${png}" alt="" draggable="false">` : (ICONS[name] || ICONS.folder)(uid());
+};
 
 /* ---------- Logos des réseaux sociaux (couleurs officielles) ---------- */
 const SOCIAL = {
