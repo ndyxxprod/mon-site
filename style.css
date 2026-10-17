@@ -80,6 +80,11 @@ img, video { display: block; }
 /* l'écran « vivant » est posé pile sur l'écran du rendu (transformation matrix3d) */
 .ld-screen { position: absolute; left: 0; top: 0; width: 1000px; height: 649px; transform-origin: 0 0; overflow: hidden; container-type: inline-size; background: #0b1028; cursor: pointer; outline: none; opacity: 0; transition: opacity .5s ease .2s, filter .25s ease; backface-visibility: hidden; }
 .landing.ready .ld-screen { opacity: 1; }
+.ld-clock { position: absolute; left: 0; top: 0; width: 380px; height: 200px; transform-origin: 0 0; display: flex; align-items: center; justify-content: center; gap: 2px; font: 500 96px/1 Inter, -apple-system, system-ui, sans-serif; letter-spacing: .03em; color: rgba(255,255,255,.9); text-shadow: 0 0 22px rgba(255,255,255,.45); font-variant-numeric: tabular-nums; pointer-events: none; opacity: 0; transition: opacity .6s ease .3s; backface-visibility: hidden; }
+.ld-clock i { font-style: normal; animation: ckBlink 2s steps(2, jump-none) infinite; }
+@keyframes ckBlink { 50% { opacity: .25; } }
+.landing.ready .ld-clock { opacity: 1; }
+.ld-clock[hidden] { display: none; }
 .ld-screen::before { content: ""; position: absolute; z-index: 3; left: 50%; top: 0; width: 11%; height: 3.2%; margin-left: -5.5%; border-radius: 0 0 11px 11px; background: #050506; }
 .ld-screen:hover, .ld-screen:focus-visible, .ld-hit:hover ~ .ld-screen { filter: brightness(1.12); }
 /* écran : réplique de l'écran verrouillé */

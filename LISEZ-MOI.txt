@@ -3,11 +3,14 @@ PORTFOLIO macOS — mode d'emploi
 
 1. OUVRIR LE SITE
    - Double-clique sur index.html (tous les fichiers du dossier doivent rester ensemble).
-   - À l'arrivée, le visiteur voit une photo réaliste (rendu 3D) d'un MacBook posé
-     sur un bureau en bois, avec un appareil photo, un storyboard et une tasse.
-     L'écran du Mac affiche l'heure réelle. On entre dans l'ordinateur en scrollant,
-     en cliquant sur le Mac, avec la touche Entrée ou le bouton « Entrer ».
-     Les images sont dans assets/arrivee/ (une version ordinateur, une version téléphone).
+   - À l'arrivée, le visiteur voit un bureau cosy en image 3D réaliste : MacBook Pro,
+     Sony A7 IV, carnet de storyboard, plantes, étagères éclairées et une grande
+     fenêtre sur la ville. La fenêtre suit l'heure réelle du visiteur :
+       nuit (21 h – 6 h), matin (6 h – 9 h), jour (9 h – 18 h), soir (18 h – 21 h).
+     L'écran du Mac et l'horloge du bureau affichent l'heure réelle.
+     Pour voir un moment précis : ajoute ?heure=nuit (ou matin, jour, soir) à l'adresse.
+     On entre dans l'ordinateur en scrollant, en cliquant sur le Mac, avec la touche
+     Entrée ou le bouton « Entrer ». Images : assets/arrivee/ (ordinateur + téléphone).
    - Liens directs utiles à partager (ils sautent l'arrivée) :
        index.html#presentation   → ouvre directement ta présentation
        index.html#contact        → ouvre directement la page Contact

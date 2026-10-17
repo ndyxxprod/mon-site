@@ -1029,14 +1029,24 @@ window.addEventListener('resize', () => {
    ================================================================== */
 const LD = { p: 0, target: 0, raf: 0, tween: 0, done: false, idle: 0, geo: null, on: false, shot: null };
 const ldEase = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-/* Rendus 3D de la scène (Blender). « screen » = coins de l'écran du Mac sur l'image
+/* Rendus 3D de la scène (Blender), un par moment de la journée : la fenêtre suit l'heure réelle.
+   « screen » / « clock » = coins de l'écran du Mac et de l'horloge sur l'image
    (haut-gauche, haut-droit, bas-droit, bas-gauche, de 0 à 1) ; « mac » = zone cliquable. */
 const LD_SHOTS = {
-  desk: { w: 2560, h: 1440, srcs: [[1600, 'assets/arrivee/bureau-1600.jpg'], [2560, 'assets/arrivee/bureau-2560.jpg']],
-    screen: [[0.36563, 0.23916], [0.63437, 0.23916], [0.63453, 0.54923], [0.36547, 0.54923]], mac: [0.3334, 0.2241, 0.6666, 0.7358] },
-  mobile: { w: 1080, h: 1920, srcs: [[1080, 'assets/arrivee/bureau-mobile.jpg']],
-    screen: [[0.28014, 0.26066], [0.71986, 0.26066], [0.70792, 0.41854], [0.29208, 0.41854]], mac: [0.2445, 0.2524, 0.7555, 0.5429] }
+  desk: { w: 2240, h: 1260, srcs: t => [[1600, `assets/arrivee/bureau-${t}-1600.jpg`], [2240, `assets/arrivee/bureau-${t}.jpg`]],
+    screen: [[0.43067, 0.41017], [0.59091, 0.43156], [0.58013, 0.63099], [0.42018, 0.5977]],
+    clock: [[0.86075, 0.7537], [0.9466, 0.75177], [0.93988, 0.82491], [0.85531, 0.82702]], mac: [0.3628, 0.4014, 0.5949, 0.7529] },
+  mobile: { w: 1080, h: 1920, srcs: t => [[1080, `assets/arrivee/bureau-${t}-mobile.jpg`]],
+    screen: [[0.27023, 0.48592], [0.55802, 0.48305], [0.55856, 0.58335], [0.27912, 0.58705]],
+    clock: null, mac: [0.241, 0.4776, 0.5851, 0.684] }
 };
+// nuit 21 h – 6 h · matin 6 h – 9 h · jour 9 h – 18 h · soir 18 h – 21 h (?heure=soir dans l'adresse pour forcer)
+function ldPhase() {
+  const f = (location.search.match(/[?&]heure=(nuit|matin|jour|soir)/) || [])[1]; if (f) return f;
+  const h = new Date().getHours();
+  return h < 6 ? 'nuit' : h < 9 ? 'matin' : h < 18 ? 'jour' : h < 21 ? 'soir' : 'nuit';
+}
+const LD_CLOCK = [380, 200];   // horloge du bureau avant déformation
 const LD_SCREEN = [1000, 649];   // taille de l'écran « vivant » avant déformation
 function quadMatrix(w, h, p) {
   // homographie : rectangle w×h → quadrilatère p (4 coins, sens horaire depuis haut-gauche)
@@ -1077,19 +1087,23 @@ function ldClock() {
   const d = new Date();
   const t = $('.lds-time'), dd = $('.lds-date');
   if (t) t.textContent = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const ck = $('#ldClock'); if (ck) ck.innerHTML = `${pad(d.getHours())}<i>:</i>${pad(d.getMinutes())}`;
+  if (LD.phase && LD.phase !== ldPhase()) layoutLanding();   // la lumière change avec l'heure
   if (dd) dd.textContent = ucfirst(d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }));
 }
 function layoutLanding() {
   const L = $('#landing'); if (!L || LD.done) return;
   const vw = innerWidth, vh = innerHeight;
   const shot = vw / vh < 0.8 ? LD_SHOTS.mobile : LD_SHOTS.desk;
-  // image adaptée à l'écran (taille réelle en pixels)
+  // image adaptée à l'écran (taille réelle en pixels) et au moment de la journée
+  const phase = ldPhase(), srcs = shot.srcs(phase);
   const need = Math.max(vw, vh * shot.w / shot.h) * Math.min(devicePixelRatio || 1, 2);
-  const src = (shot.srcs.find(([w]) => w >= need) || shot.srcs[shot.srcs.length - 1])[1];
+  const src = (srcs.find(([w]) => w >= need) || srcs[srcs.length - 1])[1];
   const img = $('#ldPhoto');
-  const cur = img.getAttribute('src'), rank = u => shot.srcs.findIndex(x => x[1] === u);
-  if (!cur || LD.shot !== shot || rank(src) > rank(cur)) img.src = src;   // on ne redescend jamais en qualité
-  LD.shot = shot;
+  const cur = img.getAttribute('src'), rank = u => srcs.findIndex(x => x[1] === u);
+  if (!cur || LD.shot !== shot || LD.phase !== phase || rank(src) > rank(cur)) img.src = src;   // on ne redescend jamais en qualité
+  LD.shot = shot; LD.phase = phase;
+  $('#landing').dataset.phase = phase;
   // « cover » : la photo remplit la fenêtre
   const k = Math.max(vw / shot.w, vh / shot.h), dw = shot.w * k, dh = shot.h * k;
   const ox = (vw - dw) / 2, oy = (vh - dh) / 2;
@@ -1097,6 +1111,9 @@ function layoutLanding() {
   img.style.transform = `translate(${ox.toFixed(1)}px,${oy.toFixed(1)}px)`;
   const P = shot.screen.map(([u, v]) => [ox + u * dw, oy + v * dh]);
   $('#ldScreen').style.transform = quadMatrix(LD_SCREEN[0], LD_SCREEN[1], P);
+  const ck = $('#ldClock'), cq = shot.clock;
+  ck.hidden = !cq;
+  if (cq) ck.style.transform = quadMatrix(LD_CLOCK[0], LD_CLOCK[1], cq.map(([u, v]) => [ox + u * dw, oy + v * dh]));
   const [mx0, my0, mx1, my1] = shot.mac, hit = $('#ldMac');
   Object.assign(hit.style, { left: ox + mx0 * dw + 'px', top: oy + my0 * dh + 'px', width: (mx1 - mx0) * dw + 'px', height: (my1 - my0) * dh + 'px' });
   // géométrie du zoom : l'écran du Mac doit finir par remplir la fenêtre
