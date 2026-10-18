@@ -18,7 +18,9 @@ const FOLDERS = {
   photo:    { label: 'Photos', icon: 'camera', f: p => p.type === 'photo' },
   design:   { label: 'Graphisme', icon: 'palette', f: p => p.type === 'design' }
 };
-const SIDEBAR = [['Favoris', ['all', 'pro', 'scolaire', 'fav']], ['Médias', ['video', 'motion', 'photo', 'design']]];
+// une catégorie sans projet n'apparaît pas dans la barre latérale
+const SIDEBAR = [['Favoris', ['all', 'pro', 'scolaire', 'fav']], ['Médias', ['video', 'motion', 'photo', 'design']]]
+  .map(([h, ks]) => [h, ks.filter(k => k === 'all' || CONFIG.projects.some(FOLDERS[k].f))]);
 const KIND = { video: 'Vidéo QuickTime', motion: 'Projet After Effects', photo: 'Image JPEG', design: 'Image PNG' };
 const kindOf = p => extFor(p) === 'psd' ? 'Document Photoshop' : KIND[p.type];
 let finderSeq = 0;
@@ -1393,7 +1395,7 @@ function buildCanva(body, rec, first) {
    CONTACT — envoi commun (page Contact + app Mail)
    ================================================================== */
 const MAIL_SENT = [];
-const SUBJECTS = ['Demande de devis', 'Projet vidéo', 'Shooting photo', 'Motion design', 'Collaboration', 'Stage / alternance'];
+const SUBJECTS = ['Demande de devis', 'Projet vidéo', 'Shooting photo', 'Contenu réseaux sociaux', 'Collaboration', 'Stage / alternance'];
 const emailOK = s => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s || '').trim());
 
 async function sendMessage(d) {

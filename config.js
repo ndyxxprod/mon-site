@@ -49,6 +49,7 @@ const CONFIG = {
   showreel: null,
 
   /* Réseaux : instagram, tiktok, youtube, linkedin, vimeo ou behance (logo officiel).
+     Ils s'affichent sur l'écran de verrouillage, dans Contacts, la page Contact et la Présentation.
      Un réseau sans « url » n'est pas affiché. */
   socials: [
     { network: 'instagram', handle: '', url: '' },

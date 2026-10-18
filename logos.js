@@ -181,6 +181,8 @@ const SOCIAL = {
   tiktok: { label: 'TikTok', svg: () => `<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#000"/><g transform="translate(5 4.6) scale(.6)"><path fill="#25f4ee" transform="translate(-.8 -.6)" d="${LOGO_PATHS.tiktok}"/><path fill="#fe2c55" transform="translate(.8 .6)" d="${LOGO_PATHS.tiktok}"/><path fill="#fff" d="${LOGO_PATHS.tiktok}"/></g></svg>` },
   behance: { label: 'Behance', svg: () => `<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#1769ff"/><g transform="translate(4 4.2) scale(.66)"><path fill="#fff" d="${LOGO_PATHS.behance}"/></g></svg>` }
 };
+// réseaux en icône blanche (écran de verrouillage, widgets)
+const socialMono = n => LOGO_PATHS[n] ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="${LOGO_PATHS[n]}"/></svg>` : socialLogo(n);
 const socialLogo = n => (SOCIAL[n] ? SOCIAL[n].svg(uid()) : `<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#8e8e93"/><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>`);
 
 /* ---------- Logo d'un logiciel à partir de son nom ---------- */

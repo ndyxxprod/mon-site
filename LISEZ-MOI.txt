@@ -18,6 +18,13 @@ PORTFOLIO macOS — mode d'emploi
        index.html#storyboards    → ouvre tes storyboards dans Notes
        index.html#bureau         → saute le démarrage
 
+   - Après l'arrivée, on tombe sur l'écran de verrouillage façon macOS 26 (grande
+     horloge, réseaux sociaux, bouton « Me contacter ») : un clic, la touche Entrée
+     ou un coup de molette ouvre la session.
+   - Apparence « Liquid Glass » de macOS 26 : fenêtres et Dock en verre translucide.
+     Fond d'écran « Tahoe » : version jour en mode clair, version nuit en mode sombre ;
+     le mode clair/sombre suit l'heure du visiteur (modifiable dans le Centre de contrôle).
+
 2. LES FICHIERS
    index.html   la page
    config.js    ← TOUT TON CONTENU EST ICI (c'est le seul fichier à modifier)

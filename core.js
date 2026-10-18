@@ -192,15 +192,18 @@ function wave(seed, n = 60, color = 'currentColor') {
 /* ==================================================================
    ÉTAT & PRÉFÉRENCES
    ================================================================== */
-const WALLPAPERS = { aurore: 'Aurore', lagon: 'Lagon', crepuscule: 'Crépuscule' };
-const STATE = { theme: 'dark', wallpaper: 'aurore', dnd: false, launched: new Set(), unlocked: false, welcomed: false, sticky: true };
+// « Tahoe » suit l'apparence : version jour en mode clair, version nuit en mode sombre
+const WALLPAPERS = { tahoe: 'Tahoe', aurore: 'Aurore', lagon: 'Lagon', crepuscule: 'Crépuscule' };
+// apparence par défaut selon l'heure du visiteur (comme le mode « Auto » de macOS)
+const autoTheme = () => { const hr = new Date().getHours(); return hr >= 7 && hr < 20 ? 'light' : 'dark'; };
+const STATE = { theme: autoTheme(), wallpaper: 'tahoe', dnd: false, launched: new Set(), unlocked: false, welcomed: false, sticky: true };
 try {
-  const s = JSON.parse(localStorage.getItem('pf-mac') || '{}');
+  const s = JSON.parse(localStorage.getItem('pf-mac26') || '{}');
   if (s.theme === 'light' || s.theme === 'dark') STATE.theme = s.theme;
   if (WALLPAPERS[s.wallpaper]) STATE.wallpaper = s.wallpaper;
   if (s.sticky === false) STATE.sticky = false;
 } catch (e) { /* stockage indisponible */ }
-const savePrefs = () => { try { localStorage.setItem('pf-mac', JSON.stringify({ theme: STATE.theme, wallpaper: STATE.wallpaper, sticky: STATE.sticky })); } catch (e) { /* rien */ } };
+const savePrefs = () => { try { localStorage.setItem('pf-mac26', JSON.stringify({ theme: STATE.theme, wallpaper: STATE.wallpaper, sticky: STATE.sticky })); } catch (e) { /* rien */ } };
 function applyTheme() { document.documentElement.dataset.theme = STATE.theme; }
 function applyWallpaper() {
   $('#desktop').dataset.wp = STATE.wallpaper;
@@ -981,6 +984,15 @@ function unlock(then) {
     setTimeout(() => notify({ title: `Bienvenue sur le portfolio de ${firstName()}`, body: `Clique sur « Présentation » en haut pour me découvrir, ou ${isTouch() ? 'touche' : 'double-clique sur'} un dossier pour voir les projets.`, ic: 'keynote', app: 'Portfolio', time: 7500, action: () => openPresentation() }), 1200);
   }
 }
+/* réseaux + raccourci contact sur l'écran de verrouillage (comme macOS 26) */
+const lockLinksHTML = () => {
+  const nets = CONFIG.socials.map(s => `<a class="lk-soc" href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc((SOCIAL[s.network] || {}).label || s.network)}" title="${esc((SOCIAL[s.network] || {}).label || s.network)}">${socialMono(s.network)}</a>`).join('');
+  return `${nets ? `<div class="lk-row">${nets}</div>` : ''}<button class="lk-pill" type="button" data-lk="contact">${G.mail}<span>Me contacter</span></button>`;
+};
+function buildLockLinks() {
+  const box = $('#lockLinks'); box.innerHTML = lockLinksHTML();
+  box.addEventListener('click', e => { if (e.target.closest('[data-lk="contact"]')) unlock(() => openContact()); });
+}
 function lockScreen() {
   closeMenus(); toggleCC(false); closeSpotlight();
   STATE.unlocked = false; $('#lock').classList.remove('unlocked'); tickClock();
@@ -1059,10 +1071,13 @@ function quadMatrix(w, h, p) {
 function buildLanding() {
   const L = $('#landing'); if (!L) return;
   LD.on = true;
-  const wp = $('#wallpaper'), cs = getComputedStyle(wp);
-  const waves = CONFIG.wallpaper ? '' : ($('svg', wp) || { outerHTML: '' }).outerHTML;
-  $('#ldScreen').innerHTML = `<div class="lds-wp" style="background-color:${cs.backgroundColor};background-image:${cs.backgroundImage}">${waves}</div>
-    <div class="lds-lock"><div class="lds-date"></div><div class="lds-time"></div><div class="lds-user"><span class="lds-av">${avatarHTML()}</span><b>${esc(CONFIG.name)}</b><small>Clique pour entrer</small></div></div><i class="lds-glare"></i>`;
+  const wp = $('#wallpaper'), cs = getComputedStyle(wp), wv = $('svg', wp);
+  const waves = wv && getComputedStyle(wv).display !== 'none' ? wv.outerHTML : '';
+  const socs = CONFIG.socials.map(s => `<i>${socialMono(s.network)}</i>`).join('');
+  $('#ldScreen').innerHTML = `<div class="lds-wp" style="background-color:${cs.backgroundColor};background-image:${cs.backgroundImage.replace(/"/g, '\'')}">${waves}</div>
+    <div class="lds-lock"><div class="lds-top"><div class="lds-date"></div><div class="lds-time"></div>${socs ? `<div class="lds-soc">${socs}</div>` : ''}<span class="lds-pill">${G.mail}Me contacter</span></div>
+      <div class="lds-user"><span class="lds-av">${avatarHTML()}</span><b>${esc(CONFIG.name)}</b><small>${esc(CONFIG.role)}</small></div>
+      <div class="lds-bot"><span class="lds-btn">${G.lock}Cliquer pour déverrouiller</span><span class="lds-hint">Clique n'importe où ou appuie sur Entrée</span></div></div><i class="lds-glare"></i>`;
   $('#ldBrand').innerHTML = `<span class="ld-mono">${monogram()}</span><span><b>${esc(CONFIG.name)}</b><small>${esc(CONFIG.role)} · Portfolio</small></span>`;
   const img = $('#ldPhoto');
   img.addEventListener('load', () => L.classList.add('ready'));
@@ -1172,9 +1187,7 @@ function ldEnter() {
   $('#boot').classList.add('done');
   L.classList.add('out');
   setTimeout(() => L.remove(), 600);
-  // ouverture de session automatique, comme si on tapait le mot de passe
-  setTimeout(() => { $('#lock').classList.add('logging'); }, 250);
-  setTimeout(() => { $('#lock').classList.remove('logging'); unlock(); }, 1150);
+  // on arrive sur l'écran verrouillé (réseaux, contact) : un clic ouvre la session
 }
 
 /* ==================================================================
@@ -1187,10 +1200,13 @@ function init() {
   $('#bootLogo').innerHTML = monogram();
   $('#lockAvatar').innerHTML = avatarHTML();
   $('#lockName').textContent = CONFIG.name;
-  $('.lock-go').innerHTML = G.arrowR;
+  $('#lockRole').textContent = CONFIG.role;
+  $('.lock-ic').innerHTML = G.lock;
+  buildLockLinks();
   buildMenubar(); buildDock(); buildWidgets(); buildDesk(); buildPolas(); buildCC(); wireSpotlight();
   tickClock(); setInterval(tickClock, 15000);
-  $('#lock').addEventListener('click', () => unlock());
+  $('#lock').addEventListener('click', e => { if (!e.target.closest('a, [data-lk]')) unlock(); });
+  $('#lock').addEventListener('wheel', e => { if (e.deltaY > 20) unlock(); }, { passive: true });
 
   const hash = location.hash.replace('#', '');
   const deep = { presentation: () => openPresentation(), contact: () => openContact(), projets: () => openFolder('all'), storyboards: () => openNotes('folder:storyboards') }[hash];
