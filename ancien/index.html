@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Portfolio — Vidéaste freelance</title>
+  <meta name="description" content="Portfolio vidéo et photo : clips, événementiel, sport, contenus pour les réseaux sociaux, storyboards et photographie.">
+  <meta name="theme-color" content="#0b1026">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=9d89ab21">
+  <link rel="stylesheet" href="apps.css?v=ec4a8433">
+</head>
+<body>
+
+  <!-- ============ ARRIVÉE : le MacBook posé sur la table ============ -->
+  <div id="landing" class="landing">
+    <div class="ld-scene" id="ldScene">
+      <img class="ld-photo" id="ldPhoto" alt="Un bureau cosy : MacBook Pro ouvert, appareil photo Sony, carnet de storyboard, plantes et vue sur la ville par la fenêtre" decoding="async">
+      <button class="ld-hit" id="ldMac" type="button" tabindex="-1" aria-hidden="true"></button>
+      <div class="ld-screen" id="ldScreen" role="button" tabindex="0" aria-label="Allumer le MacBook et entrer dans le portfolio"></div>
+      <div class="ld-clock" id="ldClock" aria-hidden="true"></div>
+    </div>
+    <div class="ld-ui">
+      <div class="ld-brand" id="ldBrand"></div>
+      <button class="ld-skip" id="ldSkip" type="button">Entrer</button>
+      <div class="ld-hint" id="ldHint"><span class="ld-mouse"><i></i></span><span>Scrolle ou clique sur le Mac pour entrer</span></div>
+    </div>
+  </div>
+
+  <!-- ============ DÉMARRAGE ============ -->
+  <div id="boot" class="boot" aria-hidden="true">
+    <div class="boot-logo" id="bootLogo"></div>
+    <div class="boot-bar"><span id="bootFill"></span></div>
+    <div class="boot-skip">Cliquer pour passer</div>
+  </div>
+
+  <!-- ============ ÉCRAN VERROUILLÉ ============ -->
+  <div id="lock" class="lock">
+    <div class="lock-top">
+      <div class="lock-date" id="lockDate"></div>
+      <div class="lock-time" id="lockTime"></div>
+      <div class="lock-links" id="lockLinks"></div>
+    </div>
+    <div class="lock-user">
+      <div class="avatar" id="lockAvatar"></div>
+      <div class="lock-name" id="lockName"></div>
+      <div class="lock-role" id="lockRole"></div>
+    </div>
+    <div class="lock-bottom">
+      <button class="lock-btn" id="lockBtn" type="button"><span class="lock-ic"></span>Cliquer pour déverrouiller</button>
+      <p class="lock-hint">Clique n'importe où ou appuie sur Entrée</p>
+    </div>
+  </div>
+
+  <!-- ============ BUREAU ============ -->
+  <main id="desktop" class="desktop" aria-label="Bureau du portfolio">
+    <div class="wallpaper" id="wallpaper">
+      <svg class="waves" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="wvA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+          <linearGradient id="wvB" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        </defs>
+        <path d="M-100 620C180 470 420 760 760 600S1260 380 1560 520V1000H-100Z" fill="url(#wvA)"/>
+        <path d="M-100 720C260 600 520 820 860 700S1300 560 1560 660V1000H-100Z" fill="url(#wvB)"/>
+        <path d="M-100 380C220 240 520 520 820 380S1240 180 1560 300" fill="none" stroke="#fff" stroke-opacity=".1" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <header class="menubar" id="menubar"></header>
+
+    <section class="widgets" id="widgets" aria-label="Widgets"></section>
+    <section class="desk-icons" id="deskIcons" aria-label="Fichiers du bureau"></section>
+    <div class="select-rect" id="selectRect"></div>
+
+    <div class="windows" id="windows"></div>
+    <div class="notif-stack" id="notifs" aria-live="polite"></div>
+
+    <nav class="dock-wrap" aria-label="Dock">
+      <div class="dock glass" id="dock"></div>
+    </nav>
+
+    <div class="spotlight" id="spotlight" role="dialog" aria-label="Recherche">
+      <div class="sp-box glass">
+        <label class="sp-input"><span class="sp-ico"></span><input id="spInput" type="text" placeholder="Rechercher un projet, une app…" autocomplete="off" spellcheck="false"></label>
+        <div class="sp-results" id="spResults"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="dim" id="dim"></div>
+
+  <noscript>
+    <div class="noscript">Ce portfolio a besoin de JavaScript pour s'afficher.</div>
+  </noscript>
+
+  <!-- Si le site ne démarre pas (fichier manquant, erreur), on l'affiche au lieu d'un écran vide -->
+  <script>
+    window.__pfErrors = [];
+    window.addEventListener('error', function (e) { window.__pfErrors.push((e.message || 'Erreur') + (e.filename ? ' (' + e.filename.split('/').pop() + ', ligne ' + e.lineno + ')' : '')); });
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (window.__pfReady) return;
+        var files = [['config.js', typeof CONFIG !== 'undefined'], ['logos.js', typeof toolLogo === 'function'], ['core.js', typeof buildLanding === 'function'], ['apps.js', typeof openLR === 'function']];
+        var miss = files.filter(function (f) { return !f[1]; }).map(function (f) { return f[0]; });
+        var box = document.createElement('div');
+        box.className = 'pf-fail';
+        box.innerHTML = '<b>Le portfolio n\'a pas pu démarrer.</b>' +
+          (miss.length ? '<p>Fichiers introuvables : <code>' + miss.join('</code>, <code>') + '</code>. Ils doivent être dans le même dossier que index.html (avec style.css, apps.css et le dossier assets).</p>' : '') +
+          (window.__pfErrors.length ? '<p>Erreur : ' + window.__pfErrors.slice(0, 3).join('<br>') + '</p>' : '');
+        document.body.appendChild(box);
+      }, 1200);
+    });
+  </script>
+  <script defer src="config.js?v=848dcba8"></script>
+  <script defer src="logos.js?v=eda0074c"></script>
+  <script defer src="core.js?v=cf9921d1"></script>
+  <script defer src="apps.js?v=5210e8b9"></script>
+</body>
+</html>
