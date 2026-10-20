@@ -8,7 +8,7 @@
 (() => {
   const gsap = window.gsap;
   const ST = window.ScrollTrigger;
-  if (!gsap || !ST || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!gsap || !ST || document.documentElement.classList.contains('lite') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   gsap.registerPlugin(ST);
 
   const html = document.documentElement;

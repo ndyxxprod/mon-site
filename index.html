@@ -13,6 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@300;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // ?lite dans l'adresse = version sans animations ni effets (test et vieux navigateurs)
+    if (/[?&]lite/.test(location.search)) document.documentElement.classList.add('lite');
+  </script>
 </head>
 <body class="is-loading">
 

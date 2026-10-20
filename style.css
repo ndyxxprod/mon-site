@@ -681,6 +681,13 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
   .palette-label { display: none; }
 }
 
+/* ---------- Version légère (?lite) ---------- */
+.lite .grain, .lite .hero-glow, .lite .loader { display: none; }
+.lite .hero-bg { background: radial-gradient(60% 70% at 25% 30%, color-mix(in oklab, var(--c1) 70%, transparent), transparent), radial-gradient(50% 60% at 80% 40%, color-mix(in oklab, var(--c2) 60%, transparent), transparent), var(--bg); }
+.lite .hero-title .word { transform: none; transition: none; }
+.lite .manifesto-text span { color: var(--lit, var(--fg)); text-shadow: none; }
+.lite .contact { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   html { scroll-behavior: auto; }

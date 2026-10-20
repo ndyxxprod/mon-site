@@ -493,7 +493,7 @@
   const loader = $('#loader');
   const num = $('#loader-num');
   const bar = $('#loader-bar');
-  const duration = reduceMotion ? 0 : 1500;
+  const duration = reduceMotion || document.documentElement.classList.contains('lite') ? 0 : 1500;
   const start = performance.now();
   let finished = false;
   function finish() {
