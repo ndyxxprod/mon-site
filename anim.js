@@ -18,6 +18,9 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const cssVar = (name) => getComputedStyle(html).getPropertyValue(name).trim();
+  // ?sans=lenis,canvas,pin,tapes,intro : coupe un module (sert à trouver ce qui gêne un navigateur)
+  const off = new Set((new URLSearchParams(location.search).get('sans') || '').split(','));
+  if (off.has('canvas')) html.classList.add('no-canvas');
 
   /* ---------- Découpe un texte en mots (.w) et lettres (.ch) ---------- */
   function split(el) {
@@ -46,7 +49,7 @@
 
   /* ================= DÉFILEMENT FLUIDE ================= */
   let lenis = null;
-  if (window.Lenis) {
+  if (window.Lenis && !off.has('lenis')) {
     lenis = new window.Lenis({ lerp: 0.085, smoothWheel: true });
     lenis.on('scroll', ST.update);
     gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -91,7 +94,8 @@
   const iris = { r: 0, rot: 0 };
   drawIris(0, 0);
 
-  window.__intro = (loader, finish) => {
+  if (off.has('intro')) window.__intro = (loader, finish) => { loader.remove(); finish(); heroIntro(); };
+  else window.__intro = (loader, finish) => {
     const tl = gsap.timeline();
     tl.to(['.loader-name', '.loader-count', '.loader-bar'], { opacity: 0, y: -24, duration: 0.45, stagger: 0.05, ease: 'power3.in' })
       .to('#flash', { opacity: 0.55, duration: 0.07 })
@@ -187,7 +191,7 @@
   let mxN = 0.5, myN = 0.5, fx = 0.5, fy = 0.5;
   addEventListener('mousemove', (e) => { mxN = e.clientX / innerWidth; myN = e.clientY / innerHeight; });
   ST.create({ trigger: hero, start: 'top bottom', end: 'bottom top', onToggle: (s) => { heroActive = s.isActive; } });
-  gsap.ticker.add((time) => {
+  if (!off.has('canvas')) gsap.ticker.add((time) => {
     if (!heroActive) return;
     const t = time * 1000;
     colors.forEach((c, i) => c.forEach((v, j) => { c[j] = v + (target[i][j] - v) * 0.06; }));
@@ -227,10 +231,9 @@
 
   /* ================= BANDEAUX CROISÉS ================= */
   let tapeDir = 1;
-  $$('.tape .marquee-track').forEach((track, i) => {
+  if (!off.has('tapes')) $$('.tape .marquee-track').forEach((track, i) => {
     const dir = i ? 1 : -1;
     let x = 0;
-    const skew = gsap.quickTo(track, 'skewX', { duration: 0.4, ease: 'power3' });
     gsap.ticker.add(() => {
       const w = track.scrollWidth / 2;
       if (!w) return;
@@ -238,7 +241,6 @@
       const speed = 1.1 * (1 + Math.min(Math.abs(vel) / 220, 10));
       x = gsap.utils.wrap(-w, 0, x + dir * tapeDir * speed);
       gsap.set(track, { x });
-      skew(clamp(-vel / 120, -14, 14) * dir);
     });
   });
   gsap.fromTo('.tape-a', { rotate: -7 }, { rotate: -2, ease: 'none', scrollTrigger: { trigger: '.tapes', start: 'top bottom', end: 'bottom top', scrub: true } });
@@ -290,10 +292,9 @@
   });
 
   const mm = gsap.matchMedia();
-  mm.add('(min-width: 900px)', () => {
+  if (!off.has('pin')) mm.add('(min-width: 900px)', () => {
     html.classList.add('has-pin');
     const dist = () => Math.max(0, strip.scrollWidth - viewport.clientWidth);
-    const skew = gsap.quickTo(strip, 'skewX', { duration: 0.5, ease: 'power3' });
     const st = ST.create({
       trigger: '#sb-pin', pin: true, start: 'top top', end: () => `+=${dist() * 0.55}`,
       scrub: 0.9, invalidateOnRefresh: true,
@@ -321,7 +322,6 @@
         const n = best.dataset.n || (frames.find((f) => f.offsetLeft > best.offsetLeft)?.dataset.n ?? frames.length);
         current.textContent = pad(n);
       }
-      skew(clamp(-vel / 260, -7, 7));
     };
     const tick = () => { if (st.isActive) update(); };
     gsap.ticker.add(tick);
