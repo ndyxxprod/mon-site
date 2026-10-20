@@ -309,13 +309,11 @@
         const d = (center - half) / half;
         const ad = Math.abs(d);
         gsap.set(card, {
+          transformPerspective: 1400,
           rotationY: clamp(-d * 32, -40, 40),
-          z: -Math.min(ad, 1.5) * 180,
-          scale: 1 - Math.min(ad, 1) * 0.08,
+          scale: 1 - Math.min(ad, 1.2) * 0.12,
           opacity: clamp(1.6 - ad, 0.25, 1)
         });
-        const img = card.querySelector('img');
-        if (img) gsap.set(img, { xPercent: clamp(-d * 8, -10, 10) });
         if (ad < bestD) { bestD = ad; best = card; }
       });
       if (best) {
@@ -331,7 +329,7 @@
     return () => {
       gsap.ticker.remove(tick);
       html.classList.remove('has-pin');
-      gsap.set([strip, ...cards, ...$$('img', strip)], { clearProps: 'transform,opacity' });
+      gsap.set([strip, ...cards], { clearProps: 'transform,opacity' });
     };
   });
 
