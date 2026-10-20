@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ndimby Ramahafadrahona — Vidéaste freelance</title>
+  <meta name="description" content="Ndimby Ramahafadrahona, vidéaste freelance à Blois et Nantes : vidéos promotionnelles, couverture événementielle, contenus pour les réseaux sociaux et storyboards." />
+  <meta name="theme-color" content="#0b0b0b" />
+  <meta property="og:title" content="Ndimby Ramahafadrahona — Vidéaste freelance" />
+  <meta property="og:description" content="Vidéos promotionnelles, événementiel, réseaux sociaux. De la prise de vue au montage." />
+  <meta property="og:image" content="assets/avatar.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@300;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="is-loading">
+
+  <!-- Écran de chargement + ouverture du diaphragme -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <svg class="iris" viewBox="-50 -50 100 100" preserveAspectRatio="xMidYMid slice">
+      <g id="iris-g"></g>
+    </svg>
+    <div class="loader-name">Ndimby</div>
+    <div class="loader-count"><span id="loader-num">00</span>%</div>
+    <div class="loader-bar"><span id="loader-bar"></span></div>
+    <div class="flash" id="flash"></div>
+  </div>
+
+  <!-- Curseur personnalisé (ordinateur uniquement) -->
+  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursor-label"></span></div>
+
+  <!-- Aperçu flottant des projets -->
+  <div class="preview" id="preview" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a href="#top" class="nav-logo">Ndimby <span>R.</span></a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="#projets">Projets</a>
+      <a href="#storyboards">Storyboards</a>
+      <a href="#a-propos">À propos</a>
+      <a href="#contact" class="nav-cta">Contact</a>
+    </nav>
+    <button class="nav-burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </header>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <a href="#projets">Projets</a>
+    <a href="#storyboards">Storyboards</a>
+    <a href="#services">Services</a>
+    <a href="#a-propos">À propos</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <main id="top">
+    <!-- ACCUEIL : viseur de caméra -->
+    <section class="hero" id="hero">
+      <div class="hero-bg" id="hero-bg">
+        <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero-glow g1"></div>
+        <div class="hero-glow g2"></div>
+        <div class="hero-glow g3"></div>
+      </div>
+      <div class="grain" aria-hidden="true"></div>
+
+      <div class="viewfinder" id="viewfinder" aria-hidden="true">
+        <span class="vf-corner tl"></span><span class="vf-corner tr"></span>
+        <span class="vf-corner bl"></span><span class="vf-corner br"></span>
+        <div class="vf-top">
+          <span class="vf-rec"><i></i>REC</span>
+          <span class="vf-tc" id="timecode">00:00:00:00</span>
+          <span class="vf-specs">4K · 25p · S-Log3</span>
+        </div>
+        <div class="vf-bottom">
+          <span>ISO 800</span><span>F2.8</span><span>1/50</span><span class="vf-batt">▮▮▮▯</span>
+        </div>
+      </div>
+
+      <div class="hero-content" id="hero-content">
+        <p class="hero-kicker" id="hero-kicker"></p>
+        <h1 class="hero-title" id="hero-title">
+          <span class="line"><span class="word" id="hero-first"></span></span>
+          <span class="line line-sm"><span class="word" id="hero-last"></span></span>
+        </h1>
+        <div class="hero-foot">
+          <p class="hero-status" id="hero-status"></p>
+          <div class="hero-actions" id="hero-actions"></div>
+          <a href="#manifeste" class="hero-scroll">Scroll <span>↓</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MANIFESTE : les mots font la mise au point au scroll -->
+    <section class="manifesto" id="manifeste">
+      <p class="eyebrow reveal">(Approche)</p>
+      <p class="manifesto-text" id="manifesto-text"></p>
+    </section>
+
+    <!-- BANDEAUX CROISÉS -->
+    <div class="tapes" aria-hidden="true">
+      <div class="tape tape-a"><div class="marquee-track" id="marquee-a"></div></div>
+      <div class="tape tape-b"><div class="marquee-track" id="marquee-b"></div></div>
+    </div>
+
+    <!-- PROJETS -->
+    <section class="section projects" id="projets">
+      <div class="section-head">
+        <h2 class="section-title" data-split>Projets <sup id="projects-count"></sup></h2>
+        <div class="filters reveal" id="filters" role="tablist" aria-label="Filtrer les projets">
+          <button class="filter is-active" data-filter="all" role="tab" aria-selected="true">Tous</button>
+          <button class="filter" data-filter="pro" role="tab" aria-selected="false">Pro</button>
+          <button class="filter" data-filter="scolaire" role="tab" aria-selected="false">Scolaire</button>
+        </div>
+      </div>
+      <div class="project-head" aria-hidden="true">
+        <span>N°</span><span>Projet</span><span>Client</span><span>Type</span><span>Année</span>
+      </div>
+      <ol class="project-list" id="project-list"></ol>
+    </section>
+
+    <!-- STORYBOARDS : pellicule qui défile à l'horizontale -->
+    <section class="storyboards" id="storyboards">
+      <div class="sb-pin" id="sb-pin">
+        <div class="sb-top">
+          <h2 class="section-title" data-split>Storyboards</h2>
+          <div class="sb-counter" aria-hidden="true">
+            <span class="sb-chapter" id="sb-chapter"></span>
+            <span class="sb-num"><span id="sb-current">01</span> / <span id="sb-total">00</span></span>
+          </div>
+        </div>
+        <div class="sb-viewport" id="sb-viewport" data-lenis-prevent-touch>
+          <div class="sb-strip" id="sb-strip"></div>
+        </div>
+        <div class="sb-progress" aria-hidden="true"><span id="sb-bar"></span></div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section services" id="services">
+      <div class="services-inner">
+        <div class="section-head">
+          <h2 class="section-title" data-split>Services</h2>
+          <p class="section-intro reveal">De la prise de vue au montage, pour valoriser des événements, des projets et des marques.</p>
+        </div>
+        <div class="service-grid" id="service-grid"></div>
+      </div>
+    </section>
+
+    <!-- À PROPOS -->
+    <section class="section about" id="a-propos">
+      <div class="section-head">
+        <h2 class="section-title" data-split>À propos</h2>
+      </div>
+      <div class="about-grid">
+        <figure class="about-photo" id="about-photo"></figure>
+        <div class="about-body">
+          <div class="about-bio" id="about-bio"></div>
+          <div class="stats" id="stats"></div>
+          <div class="about-cols">
+            <div class="about-col reveal"><h3>Compétences</h3><ul id="skills"></ul></div>
+            <div class="about-col reveal"><h3>Logiciels</h3><ul class="tool-list" id="tools"></ul></div>
+          </div>
+          <div class="path" id="path"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+      <div class="contact-inner">
+        <p class="eyebrow reveal">(Contact)</p>
+        <h2 class="contact-title" id="contact-title"><span class="ct-line" data-split>Un projet,</span><span class="ct-line" data-split>une idée de vidéo&nbsp;?</span></h2>
+        <a class="contact-email" id="contact-email" href="#"></a>
+        <p class="contact-hint" id="copy-hint">Cliquez pour copier l'adresse</p>
+        <div class="contact-grid">
+          <div class="contact-info reveal" id="contact-info"></div>
+          <form class="contact-form reveal" id="contact-form" novalidate>
+            <div class="field"><label for="f-name">Nom</label><input id="f-name" name="name" required autocomplete="name" /></div>
+            <div class="field"><label for="f-email">E-mail</label><input id="f-email" name="email" type="email" required autocomplete="email" /></div>
+            <div class="field field-full">
+              <span class="field-label">Type de projet</span>
+              <div class="chips" id="chips"></div>
+            </div>
+            <div class="field field-full"><label for="f-msg">Message</label><textarea id="f-msg" name="message" rows="4" required></textarea></div>
+            <button class="btn btn-light" type="submit">Envoyer le message <span>→</span></button>
+            <p class="form-status" id="form-status" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-big" id="footer-big" aria-hidden="true">Ndimby</div>
+    <div class="footer-row">
+      <span id="footer-copy"></span>
+      <span>Blois · Nantes — <span id="local-time">--:--</span></span>
+      <a href="#top">Retour en haut ↑</a>
+    </div>
+  </footer>
+
+  <!-- Timeline de montage : la progression dans la page -->
+  <div class="timeline" id="timeline" aria-hidden="true">
+    <div class="tl-track" id="tl-track"></div>
+    <span class="tl-head" id="tl-head"><i></i></span>
+    <span class="tl-tc" id="tl-tc">00:00:00:00</span>
+  </div>
+
+  <!-- Sélecteur d'ambiance -->
+  <div class="palette" id="palette" hidden>
+    <span class="palette-label">Ambiance · <b id="palette-name"></b></span>
+    <div class="palette-swatches" id="palette-swatches"></div>
+  </div>
+
+  <!-- Fiche projet -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel" data-lenis-prevent>
+      <button class="modal-close" data-close aria-label="Fermer">✕</button>
+      <div class="modal-media" id="modal-media"></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Planche de storyboard en grand -->
+  <div class="lightbox" id="lightbox" hidden data-lenis-prevent>
+    <button class="modal-close" data-close aria-label="Fermer">✕</button>
+    <img id="lightbox-img" alt="" />
+  </div>
+
+  <script src="contenu.js"></script>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script src="assets/vendor/ScrollTrigger.min.js"></script>
+  <script src="assets/vendor/lenis.min.js"></script>
+  <script src="main.js"></script>
+  <script src="anim.js"></script>
+</body>
+</html>
