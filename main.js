@@ -162,67 +162,95 @@
   }).join('');
 
   const fanItems = () => $$('.fan-item:not(.is-hidden)', list);
-  let fanRot = 0, fanDrag = 0, fanDirty = true;
   const fanGeom = () => (innerWidth < 720
     ? { R: 760, step: 15, card: Math.min(220, innerWidth * 0.56) }
     : { R: 1650, step: 8.6, card: 300 });
-  function fanSpan() { return (fanItems().length - 1) * fanGeom().step; }
-  function fanTarget() {
-    // progression de la section dans l'écran → la première carte au centre en entrant, la dernière en sortant
-    const r = fan.getBoundingClientRect();
-    const p = clamp((innerHeight * 0.9 - r.top) / (r.height + innerHeight * 0.5), 0, 1);
-    const span = fanSpan();
-    return clamp(span / 2 - p * span + fanDrag, -span / 2 - 6, span / 2 + 6);
-  }
+  // pos = position de l'éventail en « cartes » (0 = première carte au centre).
+  // Il tourne tout seul en boucle ; on peut le faire glisser, il se cale ensuite sur la carte la plus proche.
+  const AUTO = reduceMotion ? 0 : 0.22;        // cartes par seconde (environ une carte toutes les 4-5 s)
+  let dragStart = null, dragMoved = false;
+  let pos = 0, speed = AUTO, snapTo = null, idleUntil = 0, hovering = false, fanVisible = true, lastT = performance.now();
+  const wrap = (v, n) => ((((v + n / 2) % n) + n) % n) - n / 2;
   function renderFan() {
     const { R, step, card } = fanGeom();
     const items = fanItems();
-    const c = (items.length - 1) / 2;
+    const n = items.length;
     fan.style.setProperty('--R', `${R}px`);
     fan.style.setProperty('--cw', `${card}px`);
     items.forEach((li, k) => {
-      const a = (k - c) * step + fanRot;
+      const w = n > 1 ? wrap(k - pos, n) : 0;
+      const a = w * step;
       const ad = Math.abs(a);
       li.style.transform = `rotate(${a.toFixed(3)}deg)`;
       li.style.zIndex = String(100 - Math.round(ad * 2));
       li.style.setProperty('--dim', Math.min(1, ad / (step * 3.4)).toFixed(3));
+      // les cartes qui passent d'un bout à l'autre de la boucle s'effacent
+      li.style.opacity = String(clamp((n / 2 - Math.abs(w)) / 0.6, 0, 1).toFixed(3));
     });
   }
-  (function fanLoop() {
-    const target = fanTarget();
-    if (fanDirty || Math.abs(target - fanRot) > 0.005) {
-      fanRot += (target - fanRot) * (reduceMotion ? 1 : 0.12);
-      renderFan();
-      fanDirty = false;
+  const nearest = (k) => { const n = fanItems().length; return k + n * Math.round((pos - k) / n); };
+  (function fanLoop(t) {
+    const dt = Math.min(0.05, (t - lastT) / 1000 || 0);
+    lastT = t;
+    if (!dragStart) {
+      if (snapTo !== null) {
+        pos += (snapTo - pos) * 0.12;
+        if (Math.abs(snapTo - pos) < 0.002) { pos = snapTo; snapTo = null; }
+      } else {
+        const want = hovering || t < idleUntil || !fanVisible ? 0 : AUTO;
+        speed += (want - speed) * 0.04;
+        pos += speed * dt;
+      }
     }
+    if (fanVisible) renderFan();
     requestAnimationFrame(fanLoop);
-  })();
-  addEventListener('resize', () => { fanDirty = true; });
+  })(performance.now());
+  new IntersectionObserver((e) => { fanVisible = e[0].isIntersecting; }).observe(fan);
+  addEventListener('resize', renderFan);
+  const pause = (ms) => { idleUntil = performance.now() + ms; speed = 0; };
 
-  // Glisser pour faire tourner (souris ou doigt)
-  let dragStart = null, dragMoved = false;
+  // Glisser pour choisir (souris ou doigt)
   fan.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
-    dragStart = { x: e.clientX, drag: fanDrag };
+    dragStart = { x: e.clientX, pos, lastX: e.clientX, lastT: performance.now(), v: 0 };
     dragMoved = false;
+    snapTo = null;
   });
   addEventListener('pointermove', (e) => {
     if (!dragStart) return;
     const dx = e.clientX - dragStart.x;
     if (Math.abs(dx) > 6) { dragMoved = true; fan.classList.add('is-dragging'); }
-    fanDrag = dragStart.drag + (dx / fanGeom().R) * (180 / Math.PI);
+    const { R, step } = fanGeom();
+    const pxPerCard = R * step * Math.PI / 180;
+    pos = dragStart.pos - dx / pxPerCard;
+    const now = performance.now();
+    dragStart.v = -(e.clientX - dragStart.lastX) / pxPerCard / Math.max(1, now - dragStart.lastT) * 1000;
+    dragStart.lastX = e.clientX; dragStart.lastT = now;
   });
-  addEventListener('pointerup', () => { dragStart = null; fan.classList.remove('is-dragging'); });
+  addEventListener('pointerup', () => {
+    if (!dragStart) return;
+    if (dragMoved) {
+      // un petit élan, puis la carte la plus proche se cale au centre
+      snapTo = Math.round(pos + clamp(dragStart.v * 0.25, -2, 2));
+      pause(4000);
+    }
+    dragStart = null;
+    fan.classList.remove('is-dragging');
+  });
   fan.addEventListener('click', (e) => { if (dragMoved) { e.stopPropagation(); e.preventDefault(); dragMoved = false; } }, true);
-  $$('.fan-nav[data-dir]').forEach((b) => b.addEventListener('click', () => { fanDrag -= +b.dataset.dir * fanGeom().step; }));
+  $$('.fan-nav[data-dir]').forEach((b) => b.addEventListener('click', () => {
+    snapTo = Math.round(snapTo ?? pos) + +b.dataset.dir;
+    pause(5000);
+  }));
   // au clavier, la carte qui reçoit le focus vient au centre
   list.addEventListener('focusin', (e) => {
     const li = e.target.closest('.fan-item');
     if (!li) return;
-    const items = fanItems();
-    const k = items.indexOf(li);
-    fanDrag += -((k - (items.length - 1) / 2) * fanGeom().step + fanRot);
+    snapTo = nearest(fanItems().indexOf(li));
+    pause(6000);
   });
+  fan.addEventListener('mouseenter', () => { hovering = true; });
+  fan.addEventListener('mouseleave', () => { hovering = false; });
   // extrait vidéo joué au survol si le projet en a un
   $$('.fan-card').forEach((cardEl) => {
     const v = $('.fc-video', cardEl);
@@ -237,7 +265,7 @@
     $$('.filter').forEach((b) => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', b === btn); });
     const f = btn.dataset.filter;
     $$('li', list).forEach((li) => li.classList.toggle('is-hidden', f !== 'all' && li.dataset.category !== f));
-    fanDrag = 0; fanDirty = true;
+    pos = 0; snapTo = null; renderFan();
     document.dispatchEvent(new Event('layout:change'));
   }));
 
