@@ -682,6 +682,12 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
   .palette-label { display: none; }
 }
 
+/* ---------- Mode Safari (allégé automatiquement) ---------- */
+.safe .cursor, .safe .preview { display: none !important; }
+.safe .grain, .safe .contact, .safe .hero-status::before { animation: none; }
+.safe .manifesto-text span { text-shadow: none; }
+.safe .menu { transition: none; }
+
 /* ---------- Version légère (?lite) ---------- */
 .no-canvas .hero-canvas { display: none; }
 .lite .grain, .lite .hero-glow, .lite .loader { display: none; }

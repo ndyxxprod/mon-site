@@ -16,10 +16,18 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  // Safari (et tout navigateur iPhone/iPad) plante avec l'ensemble des effets :
+  // on y lance une version allégée. ?full force la version complète.
+  const ua = navigator.userAgent;
+  const ios = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const safe = !/[?&]full/.test(location.search) &&
+    (ios || (/Safari/.test(ua) && !/(Chrome|Chromium|Edg|OPR|Android|Firefox)/.test(ua)));
+  if (safe) html.classList.add('safe');
+  const fine = !safe && matchMedia('(hover: hover) and (pointer: fine)').matches;
   const cssVar = (name) => getComputedStyle(html).getPropertyValue(name).trim();
   // ?sans=lenis,canvas,pin,tapes,intro : coupe un module (sert à trouver ce qui gêne un navigateur)
   const off = new Set((new URLSearchParams(location.search).get('sans') || '').split(','));
+  if (safe) ['lenis', 'canvas', 'pin', 'intro'].forEach((m) => off.add(m));
   if (off.has('canvas')) html.classList.add('no-canvas');
 
   /* ---------- Découpe un texte en mots (.w) et lettres (.ch) ---------- */
@@ -285,7 +293,7 @@
   const chapter = $('#sb-chapter');
   const pad = (n) => String(n).padStart(2, '0');
 
-  gsap.fromTo(cards.slice(0, 6), { x: 260, opacity: 0, rotationY: -50 }, {
+  gsap.fromTo(cards.slice(0, 6), { x: 260, opacity: 0, rotationY: safe ? 0 : -50 }, {
     x: 0, opacity: 1, rotationY: 0, duration: 1.4, ease: 'expo.out', stagger: 0.08,
     scrollTrigger: { trigger: '#storyboards', start: 'top 70%', once: true },
     clearProps: 'rotationY'
@@ -338,7 +346,7 @@
   });
 
   /* ================= SERVICES ================= */
-  gsap.fromTo('.services', { clipPath: 'inset(8% 6% 0% 6% round 64px)' }, {
+  if (!safe) gsap.fromTo('.services', { clipPath: 'inset(8% 6% 0% 6% round 64px)' }, {
     clipPath: 'inset(0% 0% 0% 0% round 36px)', ease: 'none',
     scrollTrigger: { trigger: '.services', start: 'top bottom', end: 'top 25%', scrub: true }
   });
@@ -382,7 +390,7 @@
   });
 
   /* ================= CONTACT ================= */
-  gsap.fromTo('.contact', { clipPath: 'inset(6% 5% 0% 5% round 64px)' }, {
+  if (!safe) gsap.fromTo('.contact', { clipPath: 'inset(6% 5% 0% 5% round 64px)' }, {
     clipPath: 'inset(0% 0% 0% 0% round 36px)', ease: 'none',
     scrollTrigger: { trigger: '.contact', start: 'top bottom', end: 'top 30%', scrub: true }
   });
@@ -449,7 +457,7 @@
   /* ================= FICHE PROJET ================= */
   document.addEventListener('modal:open', (e) => {
     const panel = $('.modal-panel');
-    const from = e.detail && e.detail.from;
+    const from = !safe && e.detail && e.detail.from;
     if (from) {
       const r = panel.getBoundingClientRect();
       const x = clamp(from.x - r.left, 0, r.width);
