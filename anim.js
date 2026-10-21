@@ -294,16 +294,19 @@
   const mm = gsap.matchMedia();
   if (!off.has('pin')) mm.add('(min-width: 900px)', () => {
     html.classList.add('has-pin');
-    const dist = () => Math.max(0, strip.scrollWidth - viewport.clientWidth);
+    // On fait défiler la fenêtre de la pellicule (scrollLeft) au lieu de déplacer
+    // une bande de plusieurs milliers de pixels : beaucoup plus léger pour Safari
+    const dist = () => Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    const proxy = { p: 0 };
     const st = ST.create({
       trigger: '#sb-pin', pin: true, start: 'top top', end: () => `+=${dist() * 0.55}`,
       scrub: 0.9, invalidateOnRefresh: true,
-      animation: gsap.to(strip, { x: () => -dist(), ease: 'none' }),
+      animation: gsap.to(proxy, { p: 1, ease: 'none', onUpdate: () => { viewport.scrollLeft = proxy.p * dist(); } }),
       onUpdate: (self) => { bar.style.transform = `scaleX(${self.progress})`; }
     });
     const update = () => {
       const half = viewport.clientWidth / 2;
-      const sx = gsap.getProperty(strip, 'x');
+      const sx = -viewport.scrollLeft;
       let best = null, bestD = Infinity;
       cards.forEach((card) => {
         const center = card.offsetLeft + card.offsetWidth / 2 + sx;
@@ -329,7 +332,8 @@
     return () => {
       gsap.ticker.remove(tick);
       html.classList.remove('has-pin');
-      gsap.set([strip, ...cards], { clearProps: 'transform,opacity' });
+      viewport.scrollLeft = 0;
+      gsap.set(cards, { clearProps: 'transform,opacity' });
     };
   });
 
