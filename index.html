@@ -11,7 +11,7 @@
   <meta property="og:image" content="assets/avatar.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@300;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@300;500;600;700&family=Inter:wght@400;500;600&family=Permanent+Marker&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <script>
     // ?lite dans l'adresse = version sans animations ni effets (test et vieux navigateurs)
@@ -33,9 +33,6 @@
 
   <!-- Curseur personnalisé (ordinateur uniquement) -->
   <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursor-label"></span></div>
-
-  <!-- Aperçu flottant des projets -->
-  <div class="preview" id="preview" aria-hidden="true"></div>
 
   <header class="nav" id="nav">
     <a href="#top" class="nav-logo">Ndimby <span>R.</span></a>
@@ -106,38 +103,48 @@
       <div class="tape tape-b"><div class="marquee-track" id="marquee-b"></div></div>
     </div>
 
-    <!-- PROJETS -->
+    <!-- PROJETS : éventail de cartes -->
     <section class="section projects" id="projets">
-      <div class="section-head">
-        <h2 class="section-title" data-split>Projets <sup id="projects-count"></sup></h2>
-        <div class="filters reveal" id="filters" role="tablist" aria-label="Filtrer les projets">
-          <button class="filter is-active" data-filter="all" role="tab" aria-selected="true">Tous</button>
-          <button class="filter" data-filter="pro" role="tab" aria-selected="false">Pro</button>
-          <button class="filter" data-filter="scolaire" role="tab" aria-selected="false">Scolaire</button>
+      <h2 class="sr-only">Projets</h2>
+      <div class="fan" id="fan">
+        <ol class="fan-list" id="project-list"></ol>
+      </div>
+      <div class="fan-foot">
+        <p class="fan-label" aria-hidden="true">
+          <span>Projets</span><sup id="projects-count"></sup>
+          <svg class="fan-arrow-draw" viewBox="0 0 90 60" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 52 C 30 48, 52 34, 74 12"/><path d="M52 12 L 76 9 L 72 33"/></svg>
+        </p>
+        <div class="fan-controls">
+          <button class="fan-nav" type="button" data-dir="-1" aria-label="Projet précédent">←</button>
+          <div class="filters" id="filters" role="tablist" aria-label="Filtrer les projets">
+            <button class="filter is-active" data-filter="all" role="tab" aria-selected="true">Tous</button>
+            <button class="filter" data-filter="pro" role="tab" aria-selected="false">Pro</button>
+            <button class="filter" data-filter="scolaire" role="tab" aria-selected="false">Scolaire</button>
+          </div>
+          <button class="fan-nav" type="button" data-dir="1" aria-label="Projet suivant">→</button>
         </div>
+        <p class="fan-hint">Fais glisser les cartes ou scrolle · clique pour ouvrir un projet</p>
       </div>
-      <div class="project-head" aria-hidden="true">
-        <span>N°</span><span>Projet</span><span>Client</span><span>Type</span><span>Année</span>
-      </div>
-      <ol class="project-list" id="project-list"></ol>
     </section>
 
-    <!-- STORYBOARDS : pellicule qui défile à l'horizontale -->
-    <section class="storyboards" id="storyboards">
-      <div class="sb-pin" id="sb-pin">
-        <div class="sb-top">
-          <h2 class="section-title" data-split>Storyboards</h2>
-          <div class="sb-counter" aria-hidden="true">
-            <span class="sb-chapter" id="sb-chapter"></span>
-            <span class="sb-num"><span id="sb-current">01</span> / <span id="sb-total">00</span></span>
-          </div>
+    <!-- STORYBOARDS : pellicule qu'on fait glisser -->
+    <section class="section storyboards" id="storyboards">
+      <div class="sb-top">
+        <h2 class="section-title" data-split>Storyboards</h2>
+        <div class="sb-counter" aria-hidden="true">
+          <span class="sb-chapter" id="sb-chapter"></span>
+          <span class="sb-num"><span id="sb-current">01</span> / <span id="sb-total">00</span></span>
         </div>
-        <div class="sb-film">
-          <div class="sb-viewport" id="sb-viewport" data-lenis-prevent-touch>
-            <div class="sb-strip" id="sb-strip"></div>
-          </div>
+      </div>
+      <div class="sb-film">
+        <div class="sb-viewport" id="sb-viewport" data-lenis-prevent>
+          <div class="sb-strip" id="sb-strip"></div>
         </div>
+      </div>
+      <div class="sb-nav">
+        <button class="fan-nav" type="button" data-sb="-1" aria-label="Plans précédents">←</button>
         <div class="sb-progress" aria-hidden="true"><span id="sb-bar"></span></div>
+        <button class="fan-nav" type="button" data-sb="1" aria-label="Plans suivants">→</button>
       </div>
     </section>
 

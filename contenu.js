@@ -74,7 +74,7 @@ const SITE = {
   // Chiffres de la section « À propos »
   stats: [
     { value: '7', label: 'projets vidéo & photo' },
-    { value: '2', label: 'storyboards complets' },
+    { value: '16', label: 'plans de storyboard' },
     { value: '7', label: 'logiciels maîtrisés' },
     { value: '2', label: 'villes : Blois & Nantes' }
   ],
@@ -109,7 +109,8 @@ const SITE = {
       client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '5:27',
       description: "Clip réalisé en équipe dans le cadre de la SAE 302 : pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
       tags: ['Clip', 'Musique', "Projet d'équipe"], tools: ['DaVinci Resolve'], storyboard: 'sb-clip',
-      video: '', preview: '', cover: '', colors: ['#3a1c71', '#d76d77'] },
+      video: '',   // ← colle ici le lien YouTube / Vimeo du clip (ou 'assets/videos/clip.mp4')
+      preview: '', cover: '', colors: ['#3a1c71', '#d76d77'] },
 
     { id: 'suaps', title: 'Contenus réseaux — SUAPS', short: 'SUAPS', category: 'pro', type: 'Vidéo',
       client: 'SUAPS — Université de Tours', year: '2026', role: 'Tournage, montage', duration: '',
@@ -149,7 +150,8 @@ const SITE = {
   ],
 
   /* STORYBOARDS — une case par plan. Sans image, la case affiche juste le cadrage.
-     project : id du projet lié (ouvre la fiche du projet). */
+     project : id du projet lié. La dernière carte « Regarder le clip » lit la
+     vidéo de ce projet (champ video du projet, ex. lien YouTube). */
   storyboards: [
     {
       id: 'sb-clip', title: 'Clip SAE 302', project: 'clip-sae302', date: '2025',
@@ -172,29 +174,6 @@ const SITE = {
         { image: 'assets/storyboards/clip-15.jpg', shot: '04:03', framing: 'Close-up puis large', move: 'DJI puis main', text: "La petite au pied de l'arbre ; elle relève la tête, se retourne et commence à courir." },
         { image: 'assets/storyboards/clip-16.jpg', shot: '04:35', framing: 'Face à face', move: 'DJI', text: "Elle arrive enfin à sa hauteur : ils sont face à face. La scène du câlin se superpose au groupe." },
         { image: '', shot: '05:06', framing: 'Plan de fin', move: 'Plans rapprochés', text: "Fin sur le groupe et quelques plans rapprochés." }
-      ]
-    },
-    {
-      id: 'sb-basket', title: 'Storyboard Basket', date: 'À venir',
-      page: 'assets/storyboards/basket-planche.jpg',
-      description: "Film à venir — 18 plans pour un film de basket autour de Yanis : arrivée sur le terrain, échauffement, crossover, dunk et tir à trois points, avec les images de référence de chaque plan.",
-      frames: [
-        { image: 'assets/storyboards/basket-01.jpg', shot: 'Plan 1', framing: 'Plan de dos', move: 'Gauche → droite', text: "Yanis arrive sur le terrain, la balle dans les mains." },
-        { image: 'assets/storyboards/basket-02.jpg', shot: 'Plan 2', framing: 'Plan de face', move: 'Vers la gauche', text: "Yanis s'avance ; la caméra glisse pour se retrouver face à lui." },
-        { image: 'assets/storyboards/basket-03.jpg', shot: 'Plan 3', framing: 'Insert', move: 'Tilt up', text: "Il attache ses lacets ; le plan monte jusqu'à sa tête." },
-        { image: 'assets/storyboards/basket-04.jpg', shot: 'Plan 4', framing: 'Contre-plongée', move: 'Rapide', text: "Le cerceau filmé d'en bas, en vitesse." },
-        { image: 'assets/storyboards/basket-05.jpg', shot: 'Plan 5', framing: 'Middle shot', move: 'Fixe', text: "Échauffement : Yanis enchaîne les dribbles." },
-        { image: 'assets/storyboards/basket-06.jpg', shot: 'Plans 6-7', framing: 'Low shutter speed', move: 'Face caméra', text: "Yanis attaque vers moi ; l'obturation lente accentue le dribble." },
-        { image: 'assets/storyboards/basket-07.jpg', shot: 'Plan 7', framing: 'Close-up', move: 'Très rapide', text: "Rotation de son pied, puis moi qui tombe : effet crossover." },
-        { image: 'assets/storyboards/basket-08.jpg', shot: 'Plans 8-9', framing: 'POV au sol', move: 'Puis plan large', text: "Lay-up vu depuis le sol, puis de loin quand il marque." },
-        { image: 'assets/storyboards/basket-09.jpg', shot: 'Plan 9', framing: 'Plan smartphone', move: 'À la main', text: "Quelqu'un filme le moment au téléphone pendant le lay-up." },
-        { image: 'assets/storyboards/basket-10.jpg', shot: 'Plans 10-11', framing: 'Plan rapproché', move: 'Fixe', text: "Il lance la balle pour dunker ; gros plan sur ses pieds qui décollent." },
-        { image: 'assets/storyboards/basket-12.jpg', shot: 'Plan 12', framing: 'Contre-plongée', move: 'Fixe', text: "Le dunk filmé d'en bas, en couleur puis en noir et blanc." },
-        { image: 'assets/storyboards/basket-13.jpg', shot: 'Plan 13', framing: 'Insert', move: 'Fixe', text: "La balle qui rebondit." },
-        { image: 'assets/storyboards/basket-14.jpg', shot: 'Plan 14', framing: 'Insert', move: 'Fixe', text: "Il ramasse la balle et se l'envoie à lui-même." },
-        { image: 'assets/storyboards/basket-15.jpg', shot: 'Plans 15-17', framing: 'Plan large de dos', move: 'Fixe', text: "Tir à trois points ; la balle passe au-dessus de la caméra avec une traînée." },
-        { image: 'assets/storyboards/basket-17.jpg', shot: 'Plan 17', framing: 'Contre-plongée', move: 'Fixe', text: "La balle rentre dans le cerceau, vue d'en bas." },
-        { image: 'assets/storyboards/basket-18.jpg', shot: 'Plan 18', framing: 'Plan subjectif', move: 'Transition', text: "Il range sa balle dans son sac… et transition." }
       ]
     }
   ]

@@ -129,46 +129,129 @@
   $('#marquee-a').innerHTML = tapeItems(S.marquee).repeat(2);
   $('#marquee-b').innerHTML = tapeItems([...S.marquee].reverse()).repeat(2);
 
-  /* ================= PROJETS ================= */
+  /* ================= PROJETS : ÉVENTAIL DE CARTES ================= */
+  // Les cartes sont posées sur un grand cercle dont le centre est sous la section.
+  // Le scroll fait tourner l'éventail ; on peut aussi le faire glisser.
   const list = $('#project-list');
+  const fan = $('#fan');
   $('#projects-count').textContent = `(${pad(S.projects.length)})`;
-  list.innerHTML = S.projects.map((p, i) => `
-    <li data-category="${esc(p.category)}">
-      <button class="project-row" type="button" data-index="${i}" aria-label="${esc(p.title)} — voir le projet"
-        style="--p1:${(p.colors || [])[0] || 'var(--c1)'};--p2:${(p.colors || [])[1] || 'var(--c2)'}">
-        <span class="p-thumb">${posterHtml(p)}</span>
-        <span class="p-num">${pad(i + 1)}</span>
-        <span class="p-title"><span class="roll"><span class="roll-a">${esc(p.title)}</span><span class="roll-b" aria-hidden="true">${esc(p.title)}</span></span></span>
-        <span class="p-client">${esc(p.client)}</span>
-        <span class="p-type">${esc(p.tags[0] || p.type)}</span>
-        <span class="p-year">${esc(p.year)}</span>
+  list.innerHTML = S.projects.map((p, i) => {
+    const [c1, c2] = p.colors || ['#333', '#111'];
+    return `
+    <li class="fan-item" data-category="${esc(p.category)}">
+      <button class="project-row fan-card" type="button" data-index="${i}" aria-label="${esc(p.title)} — voir le projet"
+        style="--p1:${c1};--p2:${c2}">
+        ${p.cover ? `<img class="fc-cover" src="${esc(p.cover)}" alt="" loading="lazy" draggable="false" />` : ''}
+        ${p.preview ? `<video class="fc-cover fc-video" src="${esc(p.preview)}" muted loop playsinline preload="none"></video>` : ''}
+        <span class="fc-brand"><b>NR</b><span>Ndimby<br />Ramahafadrahona</span></span>
+        <svg class="fc-seal" viewBox="0 0 200 200" aria-hidden="true">
+          <defs><path id="seal-${i}" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" /></defs>
+          <circle cx="100" cy="100" r="92" />
+          <text class="fc-seal-ring"><textPath href="#seal-${i}">Ndimby Ramahafadrahona · Vidéaste freelance · ${esc(p.year)} ·</textPath></text>
+          <text class="fc-seal-mono" x="100" y="122" text-anchor="middle">NR</text>
+        </svg>
+        <span class="fc-kicker">${esc(p.type)} · ${esc(p.tags[0] || '')}</span>
+        <span class="fc-title"><span class="roll"><span class="roll-a">${esc(p.short || p.title)}</span><span class="roll-b" aria-hidden="true">${esc(p.short || p.title)}</span></span></span>
+        <span class="fc-foot">
+          <span class="fc-year">${esc(p.year)}</span>
+          <b>${esc(p.title)}</b>
+          <span>${esc(p.client)}</span>
+        </span>
       </button>
-    </li>`).join('');
+    </li>`;
+  }).join('');
+
+  const fanItems = () => $$('.fan-item:not(.is-hidden)', list);
+  let fanRot = 0, fanDrag = 0, fanDirty = true;
+  const fanGeom = () => (innerWidth < 720
+    ? { R: 760, step: 15, card: Math.min(220, innerWidth * 0.56) }
+    : { R: 1650, step: 8.6, card: 300 });
+  function fanSpan() { return (fanItems().length - 1) * fanGeom().step; }
+  function fanTarget() {
+    // progression de la section dans l'écran → la première carte au centre en entrant, la dernière en sortant
+    const r = fan.getBoundingClientRect();
+    const p = clamp((innerHeight * 0.9 - r.top) / (r.height + innerHeight * 0.5), 0, 1);
+    const span = fanSpan();
+    return clamp(span / 2 - p * span + fanDrag, -span / 2 - 6, span / 2 + 6);
+  }
+  function renderFan() {
+    const { R, step, card } = fanGeom();
+    const items = fanItems();
+    const c = (items.length - 1) / 2;
+    fan.style.setProperty('--R', `${R}px`);
+    fan.style.setProperty('--cw', `${card}px`);
+    items.forEach((li, k) => {
+      const a = (k - c) * step + fanRot;
+      const ad = Math.abs(a);
+      li.style.transform = `rotate(${a.toFixed(3)}deg)`;
+      li.style.zIndex = String(100 - Math.round(ad * 2));
+      li.style.setProperty('--dim', Math.min(1, ad / (step * 3.4)).toFixed(3));
+    });
+  }
+  (function fanLoop() {
+    const target = fanTarget();
+    if (fanDirty || Math.abs(target - fanRot) > 0.005) {
+      fanRot += (target - fanRot) * (reduceMotion ? 1 : 0.12);
+      renderFan();
+      fanDirty = false;
+    }
+    requestAnimationFrame(fanLoop);
+  })();
+  addEventListener('resize', () => { fanDirty = true; });
+
+  // Glisser pour faire tourner (souris ou doigt)
+  let dragStart = null, dragMoved = false;
+  fan.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    dragStart = { x: e.clientX, drag: fanDrag };
+    dragMoved = false;
+  });
+  addEventListener('pointermove', (e) => {
+    if (!dragStart) return;
+    const dx = e.clientX - dragStart.x;
+    if (Math.abs(dx) > 6) { dragMoved = true; fan.classList.add('is-dragging'); }
+    fanDrag = dragStart.drag + (dx / fanGeom().R) * (180 / Math.PI);
+  });
+  addEventListener('pointerup', () => { dragStart = null; fan.classList.remove('is-dragging'); });
+  fan.addEventListener('click', (e) => { if (dragMoved) { e.stopPropagation(); e.preventDefault(); dragMoved = false; } }, true);
+  $$('.fan-nav[data-dir]').forEach((b) => b.addEventListener('click', () => { fanDrag -= +b.dataset.dir * fanGeom().step; }));
+  // au clavier, la carte qui reçoit le focus vient au centre
+  list.addEventListener('focusin', (e) => {
+    const li = e.target.closest('.fan-item');
+    if (!li) return;
+    const items = fanItems();
+    const k = items.indexOf(li);
+    fanDrag += -((k - (items.length - 1) / 2) * fanGeom().step + fanRot);
+  });
+  // extrait vidéo joué au survol si le projet en a un
+  $$('.fan-card').forEach((cardEl) => {
+    const v = $('.fc-video', cardEl);
+    if (!v) return;
+    cardEl.addEventListener('mouseenter', () => { v.play().catch(() => {}); });
+    cardEl.addEventListener('mouseleave', () => { v.pause(); });
+  });
+  list.addEventListener('mouseover', (e) => list.classList.toggle('has-hover', !!e.target.closest('.fan-card')));
+  list.addEventListener('mouseleave', () => list.classList.remove('has-hover'));
 
   $$('.filter').forEach((btn) => btn.addEventListener('click', () => {
     $$('.filter').forEach((b) => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', b === btn); });
     const f = btn.dataset.filter;
     $$('li', list).forEach((li) => li.classList.toggle('is-hidden', f !== 'all' && li.dataset.category !== f));
+    fanDrag = 0; fanDirty = true;
     document.dispatchEvent(new Event('layout:change'));
   }));
 
-  /* ---------- Curseur et aperçu flottant ---------- */
+  /* ---------- Curseur ---------- */
   const cursor = $('#cursor');
   const cursorLabel = $('#cursor-label');
-  const preview = $('#preview');
-  let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my, px = mx, py = my;
+  let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
 
   if (finePointer) {
     addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; cursor.classList.add('is-visible'); });
     document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
     (function follow() {
       cx += (mx - cx) * 0.35; cy += (my - cy) * 0.35;
-      const vx = mx - px;
-      px += vx * 0.12; py += (my - py) * 0.12;
       cursor.style.transform = `translate(${cx}px, ${cy}px)`;
-      preview.style.left = `${px}px`; preview.style.top = `${py}px`;
-      // l'aperçu penche dans le sens du mouvement
-      preview.style.setProperty('--rot', `${clamp(vx * 0.08, -14, 14)}deg`);
       requestAnimationFrame(follow);
     })();
 
@@ -179,22 +262,8 @@
       cursor.classList.toggle('is-hover', !label && !!link);
       cursorLabel.textContent = label ? label.dataset.cursor : '';
     });
-
-    let current = -1;
-    $$('.project-row', list).forEach((row) => {
-      row.dataset.cursor = 'Voir';
-      row.addEventListener('mouseenter', () => {
-        list.classList.add('has-hover');
-        const i = +row.dataset.index;
-        if (i !== current) {
-          const p = S.projects[i];
-          preview.innerHTML = `<div class="preview-inner">${p.preview ? `<video src="${esc(p.preview)}" autoplay muted loop playsinline></video>` : posterHtml(p)}</div>`;
-          current = i;
-        }
-        preview.classList.add('is-visible');
-      });
-    });
-    list.addEventListener('mouseleave', () => { list.classList.remove('has-hover'); preview.classList.remove('is-visible'); });
+    $$('.fan-card').forEach((c) => { c.dataset.cursor = 'Voir'; });
+    $('#sb-viewport').dataset.cursor = 'Glisser';
   }
 
   /* ---------- Fiche projet ---------- */
@@ -260,10 +329,11 @@
   });
 
   /* ================= STORYBOARDS ================= */
-  // Une seule pellicule : une carte de présentation par storyboard, puis ses plans
+  // Une pellicule qu'on fait glisser : présentation, plans, puis le clip final
   let frameCount = 0;
   $('#sb-strip').innerHTML = S.storyboards.map((sb) => {
     const linked = sb.project ? S.projects.findIndex((p) => p.id === sb.project) : -1;
+    const project = linked >= 0 ? S.projects[linked] : null;
     const intro = `
       <article class="sb-card sb-intro" id="${esc(sb.id)}" data-chapter="${esc(sb.title)}">
         <p class="sb-meta">${esc(sb.date)} · ${sb.frames.length} plans</p>
@@ -271,7 +341,7 @@
         <p class="sb-desc">${esc(sb.description)}</p>
         <div class="sb-actions">
           ${sb.page ? `<button class="btn" type="button" data-page="${esc(sb.page)}" data-title="${esc(sb.title)}">Voir la planche</button>` : ''}
-          ${linked >= 0 ? `<button class="btn" type="button" data-open="${linked}">Le projet →</button>` : ''}
+          ${project ? `<button class="btn" type="button" data-open="${linked}">Regarder le clip ▶</button>` : ''}
         </div>
       </article>`;
     const frames = sb.frames.map((f) => {
@@ -288,17 +358,71 @@
         </figcaption>
       </figure>`;
     }).join('');
-    return intro + frames;
+    // Carte finale : le clip lui-même
+    const end = project ? `
+      <article class="sb-card sb-end" data-chapter="${esc(sb.title)}" style="--p1:${(project.colors || [])[0]};--p2:${(project.colors || [])[1]}">
+        <button class="sb-play" type="button" data-open="${linked}">
+          <span class="sb-play-ring"><span>▶</span></span>
+          <span class="sb-play-label">Regarder le clip</span>
+          <span class="sb-play-sub">${project.video ? `${esc(project.title)}${project.duration ? ` · ${esc(project.duration)}` : ''}` : 'Le clip arrive bientôt en ligne'}</span>
+        </button>
+      </article>` : '';
+    return intro + frames + end;
   }).join('');
   $('#sb-total').textContent = pad(frameCount);
   $('#sb-chapter').textContent = S.storyboards[0] ? S.storyboards[0].title : '';
 
   $('#sb-strip').addEventListener('click', (e) => {
+    if (sbDragged) return;
     const page = e.target.closest('[data-page]');
     if (page) openLightbox(page.dataset.page, page.dataset.title);
     const open = e.target.closest('[data-open]');
     if (open) openProject(+open.dataset.open);
   });
+
+  // Compteur de plans, barre de progression, flèches et glisser à la souris
+  const sbView = $('#sb-viewport');
+  const sbCards = $$('.sb-card', sbView);
+  function updateStrip() {
+    const max = sbView.scrollWidth - sbView.clientWidth;
+    $('#sb-bar').style.transform = `scaleX(${max > 0 ? sbView.scrollLeft / max : 0})`;
+    const mid = sbView.scrollLeft + sbView.clientWidth / 2;
+    let best = sbCards[0], bestD = Infinity;
+    sbCards.forEach((c) => {
+      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+      if (d < bestD) { bestD = d; best = c; }
+    });
+    if (best) $('#sb-current').textContent = best.classList.contains('sb-end') ? 'FIN' : pad(best.dataset.n || 1);
+    document.dispatchEvent(new Event('strip:scroll'));
+  }
+  let sbTick = false;
+  sbView.addEventListener('scroll', () => {
+    if (sbTick) return;
+    sbTick = true;
+    requestAnimationFrame(() => { updateStrip(); sbTick = false; });
+  }, { passive: true });
+  $$('[data-sb]').forEach((b) => b.addEventListener('click', () => {
+    const w = (sbCards[1] || sbCards[0]).offsetWidth + 18;
+    sbView.scrollBy({ left: +b.dataset.sb * w * 2, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }));
+  let sbDown = null, sbDragged = false;
+  sbView.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    sbDown = { x: e.clientX, left: sbView.scrollLeft };
+    sbDragged = false;
+  });
+  addEventListener('pointermove', (e) => {
+    if (!sbDown) return;
+    const dx = e.clientX - sbDown.x;
+    if (Math.abs(dx) > 6) { sbDragged = true; sbView.classList.add('is-drag'); }
+    if (sbDragged) sbView.scrollLeft = sbDown.left - dx;
+  });
+  addEventListener('pointerup', () => {
+    sbDown = null;
+    sbView.classList.remove('is-drag');
+    setTimeout(() => { sbDragged = false; }, 0);
+  });
+  updateStrip();
 
   const lightbox = $('#lightbox');
   function openLightbox(src, title) {

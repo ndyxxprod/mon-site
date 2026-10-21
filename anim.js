@@ -255,11 +255,14 @@
   gsap.fromTo('.tape-b', { rotate: 7 }, { rotate: 2.5, ease: 'none', scrollTrigger: { trigger: '.tapes', start: 'top bottom', end: 'bottom top', scrub: true } });
 
   /* ================= PROJETS ================= */
-  const rows = $$('.project-list li');
-  gsap.set(rows, { y: 70, opacity: 0 });
-  ST.batch(rows, {
-    start: 'top 92%', once: true,
-    onEnter: (els) => gsap.to(els, { y: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.09 })
+  // Les cartes de l'éventail montent une à une
+  gsap.fromTo('.fan-card', { yPercent: 70, opacity: 0 }, {
+    yPercent: 0, opacity: 1, duration: 1.3, ease: 'expo.out', stagger: { each: 0.07, from: 'center' },
+    scrollTrigger: { trigger: '#projets', start: 'top 75%', once: true }
+  });
+  gsap.fromTo('.fan-label', { yPercent: 40, opacity: 0, rotate: -4 }, {
+    yPercent: 0, opacity: 1, rotate: 0, duration: 1.2, ease: 'expo.out',
+    scrollTrigger: { trigger: '.fan-label', start: 'top 92%', once: true }
   });
 
   // Titre qui « roule » au survol : la version colorée remplace la blanche lettre par lettre
@@ -267,7 +270,7 @@
     const a = split($('.roll-a', row));
     const b = split($('.roll-b', row));
     const n = Math.max(1, b.length - 1);
-    b.forEach((ch, i) => { ch.style.color = `color-mix(in oklab, var(--p2) ${Math.round((i / n) * 100)}%, var(--p1))`; });
+    b.forEach((ch, i) => { ch.style.color = `color-mix(in oklab, var(--r2, var(--p2)) ${Math.round((i / n) * 100)}%, var(--r1, var(--p1)))`; });
     gsap.set(b, { yPercent: 105 });
     const over = () => {
       gsap.to(a, { yPercent: -105, duration: 0.55, stagger: 0.012, ease: 'power3.inOut', overwrite: true });
@@ -283,67 +286,27 @@
     row.addEventListener('blur', out);
   });
 
-  /* ================= STORYBOARDS : PELLICULE 3D ================= */
-  const strip = $('#sb-strip');
+  /* ================= STORYBOARDS : PELLICULE ================= */
   const viewport = $('#sb-viewport');
-  const cards = $$('.sb-card', strip);
-  const frames = cards.filter((c) => c.classList.contains('frame'));
-  const bar = $('#sb-bar');
-  const current = $('#sb-current');
-  const chapter = $('#sb-chapter');
-  const pad = (n) => String(n).padStart(2, '0');
-
-  gsap.fromTo(cards.slice(0, 6), { x: 260, opacity: 0, rotationY: safe ? 0 : -50 }, {
-    x: 0, opacity: 1, rotationY: 0, duration: 1.4, ease: 'expo.out', stagger: 0.08,
-    scrollTrigger: { trigger: '#storyboards', start: 'top 70%', once: true },
-    clearProps: 'rotationY'
+  const cards = $$('.sb-card', viewport);
+  gsap.fromTo(cards.slice(0, 5), { x: 220, opacity: 0 }, {
+    x: 0, opacity: 1, duration: 1.4, ease: 'expo.out', stagger: 0.08,
+    scrollTrigger: { trigger: '#storyboards', start: 'top 70%', once: true }
   });
-
-  const mm = gsap.matchMedia();
-  if (!off.has('pin')) mm.add('(min-width: 900px)', () => {
-    html.classList.add('has-pin');
-    // On fait défiler la fenêtre de la pellicule (scrollLeft) au lieu de déplacer
-    // une bande de plusieurs milliers de pixels : beaucoup plus léger pour Safari
-    const dist = () => Math.max(0, viewport.scrollWidth - viewport.clientWidth);
-    const proxy = { p: 0 };
-    const st = ST.create({
-      trigger: '#sb-pin', pin: true, start: 'top top', end: () => `+=${dist() * 0.55}`,
-      scrub: 0.9, invalidateOnRefresh: true,
-      animation: gsap.to(proxy, { p: 1, ease: 'none', onUpdate: () => { viewport.scrollLeft = proxy.p * dist(); } }),
-      onUpdate: (self) => { bar.style.transform = `scaleX(${self.progress})`; }
-    });
-    const update = () => {
+  // Les cartes pivotent légèrement selon leur place dans la pellicule (pas sur Safari)
+  if (!safe) {
+    const tilt = () => {
       const half = viewport.clientWidth / 2;
-      const sx = -viewport.scrollLeft;
-      let best = null, bestD = Infinity;
+      const left = viewport.scrollLeft;
       cards.forEach((card) => {
-        const center = card.offsetLeft + card.offsetWidth / 2 + sx;
-        const d = (center - half) / half;
-        const ad = Math.abs(d);
-        gsap.set(card, {
-          transformPerspective: 1400,
-          rotationY: clamp(-d * 32, -40, 40),
-          scale: 1 - Math.min(ad, 1.2) * 0.12,
-          opacity: clamp(1.6 - ad, 0.25, 1)
-        });
-        if (ad < bestD) { bestD = ad; best = card; }
+        const d = (card.offsetLeft + card.offsetWidth / 2 - left - half) / half;
+        gsap.set(card, { transformPerspective: 1400, rotationY: clamp(-d * 18, -24, 24), scale: 1 - Math.min(Math.abs(d), 1.2) * 0.06 });
       });
-      if (best) {
-        chapter.textContent = best.dataset.chapter || '';
-        const n = best.dataset.n || (frames.find((f) => f.offsetLeft > best.offsetLeft)?.dataset.n ?? frames.length);
-        current.textContent = pad(n);
-      }
     };
-    const tick = () => { if (st.isActive) update(); };
-    gsap.ticker.add(tick);
-    update();
-    return () => {
-      gsap.ticker.remove(tick);
-      html.classList.remove('has-pin');
-      viewport.scrollLeft = 0;
-      gsap.set(cards, { clearProps: 'transform,opacity' });
-    };
-  });
+    document.addEventListener('strip:scroll', tilt);
+    addEventListener('resize', tilt);
+    tilt();
+  }
 
   /* ================= SERVICES ================= */
   if (!safe) gsap.fromTo('.services', { clipPath: 'inset(8% 6% 0% 6% round 64px)' }, {
