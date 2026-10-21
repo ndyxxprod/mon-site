@@ -517,7 +517,7 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
 }
 .about-bio p { margin: 0 0 20px; font-size: clamp(18px, 1.7vw, 24px); line-height: 1.45; }
 .about-bio p:first-child { font-family: var(--display); text-transform: uppercase; font-weight: 500; font-size: clamp(30px, 3.4vw, 52px); line-height: 1.02; }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin: 48px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 28px 0; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 48px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 28px 0; }
 .stat-value {
   font-family: var(--display); font-weight: 600; font-size: clamp(48px, 5vw, 84px); line-height: 1; font-variant-numeric: tabular-nums;
   background: linear-gradient(120deg, var(--c1), var(--c2) 60%, var(--c3)); -webkit-background-clip: text; background-clip: text; color: transparent;

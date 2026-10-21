@@ -73,10 +73,8 @@ const SITE = {
 
   // Chiffres de la section « À propos »
   stats: [
-    { value: '7', label: 'projets vidéo & photo' },
-    { value: '16', label: 'plans de storyboard' },
-    { value: '7', label: 'logiciels maîtrisés' },
-    { value: '2', label: 'villes : Blois & Nantes' }
+    { value: 'Blois', label: 'Loir-et-Cher' },
+    { value: 'Nantes', label: 'Loire-Atlantique' }
   ],
 
   services: [
