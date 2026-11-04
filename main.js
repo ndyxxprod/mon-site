@@ -678,6 +678,30 @@
   burger.addEventListener('click', () => setMenu(burger.getAttribute('aria-expanded') !== 'true'));
   $$('a', menu).forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
+  /* ================= EASTER EGG ================= */
+  // Taper « zizi » au clavier, ou 7 clics rapides sur le logo
+  const egg = $('#egg');
+  let eggTimer = null;
+  function showEgg() {
+    egg.hidden = false;
+    clearTimeout(eggTimer);
+    eggTimer = setTimeout(() => { egg.hidden = true; }, 4000);
+  }
+  egg.addEventListener('click', () => { egg.hidden = true; });
+  let typed = '';
+  addEventListener('keydown', (e) => {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    if (e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-4);
+    if (typed === 'zizi') { typed = ''; showEgg(); }
+  });
+  let logoClicks = [];
+  $('.nav-logo').addEventListener('click', (e) => {
+    const now = performance.now();
+    logoClicks = logoClicks.filter((t) => now - t < 2500).concat(now);
+    if (logoClicks.length >= 7) { e.preventDefault(); logoClicks = []; showEgg(); }
+  });
+
   /* ================= CLAVIER ================= */
   addEventListener('keydown', (e) => {
     if (!lightbox.hidden && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) return stepLb(e.key === 'ArrowRight' ? 1 : -1);
