@@ -54,10 +54,10 @@ const SITE = {
 
   /* Réseaux : un réseau sans « url » n'est pas affiché. */
   socials: [
-    { network: 'Instagram', url: '' },
+    { network: 'Instagram', url: 'https://www.instagram.com/ndyxx.prod/' },
     { network: 'TikTok', url: '' },
     { network: 'YouTube', url: 'https://www.youtube.com/@ndyxx_mp4' },
-    { network: 'LinkedIn', url: '' }
+    { network: 'LinkedIn', url: 'https://www.linkedin.com/in/ndimby-ramahafadrahona-b9420635a/' }
   ],
 
   // Grande phrase sous l'accueil (les mots s'allument au scroll)
