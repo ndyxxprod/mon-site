@@ -139,7 +139,7 @@ const SITE = {
       client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '',
       description: "Court-métrage réalisé en équipe dans le cadre du BUT MMI.",
       tags: ['Fiction', 'Court-métrage'], tools: ['DaVinci Resolve'],
-      video: '', preview: '', cover: '', colors: ['#2c3e50', '#c94b4b'] },
+      video: 'https://youtu.be/qoHD0Qa0w3o', preview: '', cover: '', colors: ['#2c3e50', '#c94b4b'] },
 
     { id: 'video-commerciale', title: 'Vidéo commerciale — BUT MMI', short: 'Vidéo commerciale', category: 'scolaire', type: 'Vidéo',
       client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '',
