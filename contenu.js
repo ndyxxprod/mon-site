@@ -80,8 +80,7 @@ const SITE = {
   services: [
     { icon: 'film', title: 'Vidéo promotionnelle', text: 'Des films pour valoriser une marque, un projet ou un lieu : tournage, montage, étalonnage.' },
     { icon: 'camera', title: 'Événementiel', text: "Couverture vidéo et photo d'événements : mariages, soirées, compétitions sportives." },
-    { icon: 'sparkle', title: 'Réseaux sociaux', text: 'Des formats courts pour TikTok, Instagram et YouTube, pensés pour accrocher dès la première seconde.' },
-    { icon: 'pencil', title: 'Storyboard', text: 'Un découpage plan par plan pour préparer chaque tournage, du clip au film sportif.' }
+    { icon: 'sparkle', title: 'Réseaux sociaux', text: 'Des formats courts pour TikTok, Instagram et YouTube, pensés pour accrocher dès la première seconde.' }
   ],
 
   skills: [

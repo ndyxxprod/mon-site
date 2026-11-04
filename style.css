@@ -485,7 +485,7 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
   border-radius: 36px; transition: background 0.8s;
 }
 .services-inner { padding: 0 var(--gutter); }
-.service-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.service-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .service {
   position: relative; isolation: isolate; overflow: hidden;
   padding: 28px 26px 34px; border-radius: 22px; background: rgba(255, 255, 255, 0.35);
@@ -717,7 +717,7 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
 
 /* ---------- Tablette ---------- */
 @media (max-width: 1024px) {
-  .service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .service-grid { grid-template-columns: 1fr; }
   .about-grid { grid-template-columns: 1fr; }
   .about-photo { position: relative; top: 0; max-width: 460px; }
   .contact-grid { grid-template-columns: 1fr; }
