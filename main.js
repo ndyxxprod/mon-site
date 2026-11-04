@@ -172,6 +172,23 @@
     </li>`;
   }).join('');
 
+  // Avec peu de projets, on répète les cartes pour que l'arc reste plein (8 cartes minimum)
+  function fillFan() {
+    $$('.fan-item.is-clone', list).forEach((li) => li.remove());
+    const originals = $$('.fan-item:not(.is-clone):not(.is-hidden)', list);
+    if (!originals.length) return;
+    const made = [];
+    for (let k = 0; originals.length + made.length < 8; k++) {
+      const c = originals[k % originals.length].cloneNode(true);
+      c.classList.add('is-clone');
+      c.setAttribute('aria-hidden', 'true');
+      c.querySelector('button').tabIndex = -1;
+      list.appendChild(c);
+      made.push(c);
+    }
+    document.dispatchEvent(new CustomEvent('fan:rows', { detail: made.map((li) => li.querySelector('.project-row')) }));
+  }
+  fillFan();
   const fanItems = () => $$('.fan-item:not(.is-hidden)', list);
   const fanGeom = () => (innerWidth < 720
     ? { R: 760, step: 15, card: Math.min(220, innerWidth * 0.56) }
@@ -276,6 +293,7 @@
     $$('.filter').forEach((b) => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', b === btn); });
     const f = btn.dataset.filter;
     $$('li', list).forEach((li) => li.classList.toggle('is-hidden', f !== 'all' && li.dataset.category !== f));
+    fillFan();
     pos = 0; snapTo = null; renderFan();
     document.dispatchEvent(new Event('layout:change'));
   }));
@@ -659,6 +677,30 @@
   }
   burger.addEventListener('click', () => setMenu(burger.getAttribute('aria-expanded') !== 'true'));
   $$('a', menu).forEach((a) => a.addEventListener('click', () => setMenu(false)));
+
+  /* ================= EASTER EGG ================= */
+  // Taper « zizi » au clavier, ou 7 clics rapides sur le logo
+  const egg = $('#egg');
+  let eggTimer = null;
+  function showEgg() {
+    egg.hidden = false;
+    clearTimeout(eggTimer);
+    eggTimer = setTimeout(() => { egg.hidden = true; }, 4000);
+  }
+  egg.addEventListener('click', () => { egg.hidden = true; });
+  let typed = '';
+  addEventListener('keydown', (e) => {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    if (e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-4);
+    if (typed === 'zizi') { typed = ''; showEgg(); }
+  });
+  let logoClicks = [];
+  $('.nav-logo').addEventListener('click', (e) => {
+    const now = performance.now();
+    logoClicks = logoClicks.filter((t) => now - t < 2500).concat(now);
+    if (logoClicks.length >= 7) { e.preventDefault(); logoClicks = []; showEgg(); }
+  });
 
   /* ================= CLAVIER ================= */
   addEventListener('keydown', (e) => {

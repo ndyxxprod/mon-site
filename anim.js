@@ -266,9 +266,12 @@
   });
 
   // Titre qui « roule » au survol : la version colorée remplace la blanche lettre par lettre
-  $$('.project-row').forEach((row) => {
-    const a = split($('.roll-a', row));
-    const b = split($('.roll-b', row));
+  const bindRoll = (row) => {
+    if (row.dataset.roll) return;
+    row.dataset.roll = '1';
+    // une carte copiée a déjà ses lettres découpées
+    const a = $('.roll-a .ch', row) ? $$('.roll-a .ch', row) : split($('.roll-a', row));
+    const b = $('.roll-b .ch', row) ? $$('.roll-b .ch', row) : split($('.roll-b', row));
     const n = Math.max(1, b.length - 1);
     b.forEach((ch, i) => { ch.style.color = `color-mix(in oklab, var(--r2, var(--p2)) ${Math.round((i / n) * 100)}%, var(--r1, var(--p1)))`; });
     gsap.set(b, { yPercent: 105 });
@@ -284,7 +287,9 @@
     row.addEventListener('focus', over);
     row.addEventListener('mouseleave', out);
     row.addEventListener('blur', out);
-  });
+  };
+  $$('.project-row').forEach(bindRoll);
+  document.addEventListener('fan:rows', (e) => e.detail.forEach(bindRoll));
 
   /* ================= STORYBOARDS : PELLICULE ================= */
   const viewport = $('#sb-viewport');

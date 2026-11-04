@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@300;500;600;700&family=Inter:wght@400;500;600&family=Permanent+Marker&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=202611041352" />
+  <link rel="stylesheet" href="style.css?v=202611041354" />
   <script>
     // ?lite dans l'adresse = version sans animations ni effets (test et vieux navigateurs)
     if (/[?&]lite/.test(location.search)) document.documentElement.classList.add('lite');
@@ -225,6 +225,19 @@
     <div class="palette-swatches" id="palette-swatches"></div>
   </div>
 
+  <!-- Easter egg (taper « zizi » au clavier, ou 7 clics rapides sur le logo) -->
+  <div class="egg" id="egg" hidden aria-hidden="true">
+    <svg class="egg-doodle" viewBox="0 0 200 260" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M78 196 V 70 C 78 34, 122 34, 122 70 V 196" />
+      <path d="M86 58 C 96 50, 104 50, 114 58" />
+      <path d="M100 34 V 46" />
+      <circle cx="66" cy="214" r="30" />
+      <circle cx="134" cy="214" r="30" />
+      <path d="M58 206 l 4 4 M 70 218 l 4 4 M 128 204 l 4 4 M 140 220 l 4 4" stroke-width="4" />
+    </svg>
+    <p class="egg-text">Bien vu, tu l'as trouvé.</p>
+  </div>
+
   <!-- Fiche projet -->
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
     <div class="modal-backdrop" data-close></div>
@@ -244,11 +257,11 @@
     <span class="lb-count" id="lb-count"></span>
   </div>
 
-  <script src="contenu.js?v=202611041352"></script>
+  <script src="contenu.js?v=202611041354"></script>
   <script src="assets/vendor/gsap.min.js"></script>
   <script src="assets/vendor/ScrollTrigger.min.js"></script>
   <script src="assets/vendor/lenis.min.js"></script>
-  <script src="main.js?v=202611041352"></script>
-  <script src="anim.js?v=202611041352"></script>
+  <script src="main.js?v=202611041354"></script>
+  <script src="anim.js?v=202611041354"></script>
 </body>
 </html>
