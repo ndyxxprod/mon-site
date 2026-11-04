@@ -347,13 +347,16 @@
       media.innerHTML = `<button class="modal-hero" type="button" data-gal="${Math.max(0, p.gallery.indexOf(p.cover))}" aria-label="Voir les photos en grand"><img src="${esc(p.cover || p.gallery[0])}" alt="${esc(p.title)}" /></button>`;
     } else {
       media.innerHTML = posterHtml(p);
-      media.firstElementChild.insertAdjacentHTML('beforeend', `<span class="modal-soon">${p.type === 'Photo' ? 'Photos' : 'Vidéo'} bientôt en ligne</span>`);
+      media.firstElementChild.insertAdjacentHTML('beforeend', p.link
+        ? `<a class="btn btn-light modal-link" href="${esc(p.link.url)}" target="_blank" rel="noopener">${esc(p.link.label)} <span>↗</span></a>`
+        : `<span class="modal-soon">${p.type === 'Photo' ? 'Photos' : 'Vidéo'} bientôt en ligne</span>`);
     }
     const specs = [['Client', p.client], ['Année', p.year], ['Rôle', p.role], ['Durée', p.duration], ['Outils', (p.tools || []).join(', ')]]
       .filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
     const prev = (i - 1 + S.projects.length) % S.projects.length;
     const next = (i + 1) % S.projects.length;
-    const sb = p.storyboard ? `<a class="btn" href="#storyboards" data-close>Voir le storyboard</a>` : '';
+    const sb = p.storyboard ? `<a class="btn" href="#storyboards" data-close>Voir le storyboard</a>`
+      : p.link ? `<a class="btn" href="${esc(p.link.url)}" target="_blank" rel="noopener">${esc(p.link.label)} ↗</a>` : '';
     $('#modal-body').innerHTML = `
       <div>
         <p class="eyebrow">${pad(i + 1)} — ${esc(p.category === 'pro' ? 'Projet pro' : 'Projet scolaire')}</p>

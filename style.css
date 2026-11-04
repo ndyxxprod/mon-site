@@ -672,6 +672,7 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
 .modal-media .poster { padding: clamp(18px, 3vw, 32px); }
 .modal-media .poster-title { font-size: clamp(44px, 8vw, 120px); }
 .modal-media .poster-top { padding-right: 52px; }
+.modal-link { position: absolute; left: 50%; bottom: 16%; translate: -50% 0; z-index: 2; }
 .modal-soon { position: absolute; left: 50%; bottom: 18%; transform: translateX(-50%); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(0, 0, 0, 0.55); padding: 6px 14px; border-radius: 999px; white-space: nowrap; }
 .modal-body { padding: clamp(24px, 4vw, 48px); display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 32px 48px; }
 .modal-body h2 { margin: 0 0 16px; font-family: var(--display); font-weight: 600; text-transform: uppercase; font-size: clamp(36px, 4.6vw, 64px); line-height: 0.95; }

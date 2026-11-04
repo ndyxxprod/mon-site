@@ -56,7 +56,7 @@ const SITE = {
   socials: [
     { network: 'Instagram', url: '' },
     { network: 'TikTok', url: '' },
-    { network: 'YouTube', url: '' },
+    { network: 'YouTube', url: 'https://www.youtube.com/@ndyxx_mp4' },
     { network: 'LinkedIn', url: '' }
   ],
 
@@ -160,9 +160,10 @@ const SITE = {
 
 
     { id: 'youtube', title: 'Ma chaîne YouTube', short: 'YouTube', category: 'pro', type: 'Vidéo',
-      client: 'Projet personnel', year: '2025', role: 'Conception, tournage, montage', duration: '',
-      description: "J'administre ma propre chaîne YouTube : de l'idée au montage, en passant par les miniatures.",
+      client: 'Projet personnel — @ndyxx_mp4', year: '2025', role: 'Conception, tournage, montage', duration: '',
+      description: "Ma chaîne YouTube, @ndyxx_mp4 : un espace où je publie mes propres créations, que je conçois, tourne et monte moi-même, jusqu'aux miniatures.",
       tags: ['YouTube', 'Création de contenu'], tools: ['DaVinci Resolve', 'Photoshop'],
+      link: { label: 'Voir la chaîne YouTube', url: 'https://www.youtube.com/@ndyxx_mp4' },
       video: '', preview: '', cover: '', colors: ['#f12711', '#f5af19'] }
   ],
 
