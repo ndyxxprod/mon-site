@@ -119,18 +119,18 @@ const SITE = {
       cover: 'assets/projets/mariage/mariage-02.jpg',   // photo de la carte
       gallery: [
         'assets/projets/mariage/mariage-01.jpg',
-        'assets/projets/mariage/mariage-02.jpg',
-        'assets/projets/mariage/mariage-03.jpg',
-        'assets/projets/mariage/mariage-04.jpg',
-        'assets/projets/mariage/mariage-05.jpg',
-        'assets/projets/mariage/mariage-06.jpg',
-        'assets/projets/mariage/mariage-07.jpg',
-        'assets/projets/mariage/mariage-08.jpg',
-        'assets/projets/mariage/mariage-09.jpg',
-        'assets/projets/mariage/mariage-10.jpg',
         'assets/projets/mariage/mariage-11.jpg',
+        'assets/projets/mariage/mariage-04.jpg',
+        'assets/projets/mariage/mariage-06.jpg',
+        'assets/projets/mariage/mariage-02.jpg',
+        'assets/projets/mariage/mariage-13.jpg',
+        'assets/projets/mariage/mariage-07.jpg',
+        'assets/projets/mariage/mariage-09.jpg',
+        'assets/projets/mariage/mariage-03.jpg',
         'assets/projets/mariage/mariage-12.jpg',
-        'assets/projets/mariage/mariage-13.jpg'
+        'assets/projets/mariage/mariage-05.jpg',
+        'assets/projets/mariage/mariage-08.jpg',
+        'assets/projets/mariage/mariage-10.jpg'
       ],
       colors: ['#c79081', '#dfa579'] },
 
