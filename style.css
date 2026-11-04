@@ -195,8 +195,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .vf-specs { margin-left: auto; }
 
 .hero-content {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  padding: 0 var(--gutter) clamp(48px, 8vh, 80px);
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  padding: clamp(90px, 12vh, 120px) var(--gutter) clamp(56px, 9vh, 90px);
 }
 .hero-kicker { margin: 0 0 8px; font-size: clamp(14px, 1.3vw, 18px); color: rgba(243, 240, 234, 0.85); }
 .hero-title {
@@ -212,12 +213,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; }
 .has-anim .hero-title .word { transition: none; }
 .hero-title .line:first-child .ch { cursor: default; }
-.hero-foot { display: flex; align-items: center; gap: 24px; margin-top: 28px; flex-wrap: wrap; }
+.hero-foot { display: flex; align-items: center; justify-content: center; gap: 16px 24px; margin-top: 28px; flex-wrap: wrap; }
 .hero-status { margin: 0; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; }
 .hero-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #34c759; box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.2); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 50% { box-shadow: 0 0 0 9px rgba(52, 199, 89, 0); } }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.hero-scroll { margin-left: auto; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(243, 240, 234, 0.7); }
+.hero-scroll { position: absolute; left: 50%; bottom: clamp(22px, 4vh, 44px); translate: -50% 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(243, 240, 234, 0.7); }
 .hero-scroll span { display: inline-block; animation: bob 1.8s ease-in-out infinite; }
 @keyframes bob { 50% { transform: translateY(5px); } }
 
