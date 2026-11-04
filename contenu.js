@@ -105,8 +105,8 @@ const SITE = {
   projects: [
     /* videos : plusieurs vidéos dans la même fiche (la première sert de couverture) */
     { id: 'ufab', title: 'UFAB 49 — Angers Basket', short: 'UFAB 49', category: 'pro', type: 'Vidéo',
-      client: 'UFAB 49 — Union Féminine Angers Basket', year: '2025-26', role: 'Tournage, montage', duration: '',
-      description: "Deux vidéos réalisées pour l'UFAB 49, le club professionnel de basket féminin d'Angers : un teaser pour promouvoir le prochain match de l'équipe, puis l'introduction du documentaire consacré à la victoire des U18 en Coupe de France.",
+      client: 'UFAB 49 — Union Féminine Angers Basket', year: '2025-26', role: 'Tout, du tournage au rendu final', duration: '',
+      description: "Deux vidéos réalisées pour l'UFAB 49, le club professionnel de basket féminin d'Angers : un teaser pour promouvoir le prochain match de l'équipe, puis l'introduction du documentaire consacré à la victoire des U18 en Coupe de France. J'ai pris en charge les deux vidéos de A à Z : tournage, montage, étalonnage et rendu final.",
       tags: ['Sport', 'Basket', 'Club pro'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/HxsINV4s5Nc',
       videos: [
