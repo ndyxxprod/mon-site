@@ -110,11 +110,6 @@ const SITE = {
       video: 'https://youtu.be/x39LFhQWqGU',   // le clip (lien YouTube / Vimeo, ou 'assets/videos/clip.mp4')
       preview: '', cover: '', colors: ['#3a1c71', '#d76d77'] },
 
-    { id: 'suaps', title: 'Contenus réseaux — SUAPS', short: 'SUAPS', category: 'pro', type: 'Vidéo',
-      client: 'SUAPS — Université de Tours', year: '2026', role: 'Tournage, montage', duration: '',
-      description: "Contenus audiovisuels pour les réseaux sociaux du service des sports de l'Université de Tours.",
-      tags: ['Sport', 'Réseaux sociaux'], tools: ['DaVinci Resolve', 'CapCut Pro'],
-      video: '', preview: '', cover: '', colors: ['#00c6ff', '#0050d0'] },
 
     { id: 'mariage', title: 'Mariage', short: 'Mariage', category: 'pro', type: 'Photo',
       client: 'Particuliers', year: '2025', role: 'Photographie, retouche', duration: '',
