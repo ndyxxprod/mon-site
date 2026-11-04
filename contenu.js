@@ -135,10 +135,10 @@ const SITE = {
       colors: ['#c79081', '#dfa579'] },
 
 
-    { id: 'court-metrage', title: 'Court-métrage — BUT MMI', short: 'Court-métrage', category: 'scolaire', type: 'Vidéo',
-      client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '',
-      description: "Court-métrage réalisé en équipe dans le cadre du BUT MMI.",
-      tags: ['Fiction', 'Court-métrage'], tools: ['DaVinci Resolve'],
+    { id: 'harmonya', title: 'Publicité Harmonya', short: 'Harmonya', category: 'scolaire', type: 'Vidéo',
+      client: 'BUT MMI — IUT de Blois (1re année)', year: '2025', role: 'Tournage, montage', duration: '',
+      description: "Projet de première année du BUT MMI : il fallait inventer un monde virtuel, Harmonya, puis le promouvoir à travers une vidéo publicitaire.",
+      tags: ['Publicité', 'Monde virtuel'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/qoHD0Qa0w3o', preview: '', cover: '', colors: ['#2c3e50', '#c94b4b'] },
 
     { id: 'video-commerciale', title: 'Vidéo commerciale — BUT MMI', short: 'Vidéo commerciale', category: 'scolaire', type: 'Vidéo',
