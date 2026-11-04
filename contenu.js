@@ -107,7 +107,7 @@ const SITE = {
       client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '5:27',
       description: "Clip réalisé en équipe dans le cadre de la SAE 302 : pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
       tags: ['Clip', 'Musique', "Projet d'équipe"], tools: ['DaVinci Resolve'], storyboard: 'sb-clip',
-      video: '',   // ← colle ici le lien YouTube / Vimeo du clip (ou 'assets/videos/clip.mp4')
+      video: 'https://youtu.be/x39LFhQWqGU',   // le clip (lien YouTube / Vimeo, ou 'assets/videos/clip.mp4')
       preview: '', cover: '', colors: ['#3a1c71', '#d76d77'] },
 
     { id: 'suaps', title: 'Contenus réseaux — SUAPS', short: 'SUAPS', category: 'pro', type: 'Vidéo',

@@ -66,9 +66,20 @@
     return `<video src="${esc(url)}" controls autoplay playsinline></video>`;
   }
 
+  // Miniature YouTube : sert de couverture quand le projet n'en a pas
+  function ytId(url) {
+    const m = (url || '').match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/);
+    return m ? m[1] : '';
+  }
+  S.projects.forEach((p) => {
+    const id = ytId(p.video);
+    if (!p.cover && id) { p.cover = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`; p.coverFallback = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
+  });
+  const fallbackAttr = (p) => (p.coverFallback ? ` onerror="this.onerror=null;this.src='${esc(p.coverFallback)}'"` : '');
+
   /* ---------- Affiche d'un projet (couverture ou affiche générée) ---------- */
   function posterHtml(p, { play = false } = {}) {
-    if (p.cover) return `<img src="${esc(p.cover)}" alt="${esc(p.title)}" loading="lazy" />`;
+    if (p.cover) return `<img src="${esc(p.cover)}" alt="${esc(p.title)}" loading="lazy"${fallbackAttr(p)} />`;
     const [c1, c2] = p.colors || ['#333', '#111'];
     return `<div class="poster" style="--p1:${c1};--p2:${c2}">
       <div class="poster-top"><span>${esc(p.type)}</span><span>${esc(p.year)}</span></div>
@@ -141,7 +152,7 @@
     <li class="fan-item" data-category="${esc(p.category)}">
       <button class="project-row fan-card" type="button" data-index="${i}" aria-label="${esc(p.title)} — voir le projet"
         style="--p1:${c1};--p2:${c2}">
-        ${p.cover ? `<img class="fc-cover" src="${esc(p.cover)}" alt="" loading="lazy" draggable="false" />` : ''}
+        ${p.cover ? `<img class="fc-cover" src="${esc(p.cover)}" alt="" loading="lazy" draggable="false"${fallbackAttr(p)} />` : ''}
         ${p.preview ? `<video class="fc-cover fc-video" src="${esc(p.preview)}" muted loop playsinline preload="none"></video>` : ''}
         <span class="fc-brand"><b>NR</b><span>Ndimby<br />Ramahafadrahona</span></span>
         <svg class="fc-seal" viewBox="0 0 200 200" aria-hidden="true">

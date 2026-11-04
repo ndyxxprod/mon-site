@@ -328,7 +328,11 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
 }
 .fan-list.has-hover .fan-card:not(:hover)::after { opacity: max(calc(var(--dim, 0) * 0.78), 0.45); }
 .fan-card:hover, .fan-card:focus-visible { translate: 0 -34px; scale: 1.04; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6); }
-.fc-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0.9; }
+.fc-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.fan-card:has(.fc-cover)::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 35%, transparent 45%, color-mix(in oklab, var(--p1) 70%, #000) 100%);
+}
 .fc-video { opacity: 0; transition: opacity 0.4s; }
 .fan-card:hover .fc-video { opacity: 1; }
 .fc-brand { display: flex; align-items: center; gap: 8px; font-size: 11px; line-height: 1.1; font-weight: 600; }
