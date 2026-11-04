@@ -146,6 +146,12 @@
   const list = $('#project-list');
   const fan = $('#fan');
   $('#projects-count').textContent = `(${pad(S.projects.length)})`;
+  // Sur la carte, le client sans répéter le nom déjà écrit en gros (« UFAB 49 — … » → « … »)
+  const cardClient = (p) => {
+    const c = p.client || '';
+    const short = p.short || '';
+    return short && c.toLowerCase().startsWith(short.toLowerCase()) ? c.slice(short.length).replace(/^\s*[—–-]\s*/, '') : c;
+  };
   list.innerHTML = S.projects.map((p, i) => {
     const [c1, c2] = p.colors || ['#333', '#111'];
     return `
@@ -158,27 +164,26 @@
         <svg class="fc-seal" viewBox="0 0 200 200" aria-hidden="true">
           <defs><path id="seal-${i}" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" /></defs>
           <circle cx="100" cy="100" r="92" />
-          <text class="fc-seal-ring"><textPath href="#seal-${i}">Ndimby Ramahafadrahona · Vidéaste freelance · ${esc(p.year)} ·</textPath></text>
-          <text class="fc-seal-mono" x="100" y="122" text-anchor="middle">NR</text>
+          <text class="fc-seal-ring"><textPath href="#seal-${i}">Vidéaste freelance · ${esc(p.type)} · ${esc(p.year)} · Vidéaste freelance ·</textPath></text>
         </svg>
         <span class="fc-kicker">${esc(p.type)} · ${esc(p.tags[0] || '')}</span>
         <span class="fc-title"><span class="roll"><span class="roll-a">${esc(p.short || p.title)}</span><span class="roll-b" aria-hidden="true">${esc(p.short || p.title)}</span></span></span>
         <span class="fc-foot">
           <span class="fc-year">${esc(p.year)}</span>
-          <b>${esc(p.title)}</b>
-          <span>${esc(p.client)}</span>
+          <span>${esc(cardClient(p))}</span>
         </span>
       </button>
     </li>`;
   }).join('');
 
-  // Avec peu de projets, on répète les cartes pour que l'arc reste plein (8 cartes minimum)
+  // Avec très peu de projets (filtre), on répète les cartes pour que l'arc ne soit pas vide
   function fillFan() {
     $$('.fan-item.is-clone', list).forEach((li) => li.remove());
     const originals = $$('.fan-item:not(.is-clone):not(.is-hidden)', list);
     if (!originals.length) return;
     const made = [];
-    for (let k = 0; originals.length + made.length < 8; k++) {
+    // seulement s'il y a très peu de cartes (après un filtre) : sinon on verrait les mêmes projets en double
+    for (let k = 0; originals.length < 3 && originals.length + made.length < 5; k++) {
       const c = originals[k % originals.length].cloneNode(true);
       c.classList.add('is-clone');
       c.setAttribute('aria-hidden', 'true');
