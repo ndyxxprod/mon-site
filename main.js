@@ -318,13 +318,14 @@
     $('.modal-close', modal).focus({ preventScroll: true });
     document.dispatchEvent(new CustomEvent('modal:open', { detail: { from: wasHidden ? lastClick : null } }));
   }
+  let currentGallery = null;
   function openProject(i) {
     const p = S.projects[i];
     const media = $('#modal-media');
     if (p.video) {
       media.innerHTML = playerHtml(p.video);
     } else if (p.gallery && p.gallery.length) {
-      media.innerHTML = `<img src="${esc(p.gallery[0])}" alt="${esc(p.title)}" />`;
+      media.innerHTML = `<button class="modal-hero" type="button" data-gal="${Math.max(0, p.gallery.indexOf(p.cover))}" aria-label="Voir les photos en grand"><img src="${esc(p.cover || p.gallery[0])}" alt="${esc(p.title)}" /></button>`;
     } else {
       media.innerHTML = posterHtml(p);
       media.firstElementChild.insertAdjacentHTML('beforeend', `<span class="modal-soon">${p.type === 'Photo' ? 'Photos' : 'Vidéo'} bientôt en ligne</span>`);
@@ -346,7 +347,13 @@
         <button class="btn" type="button" data-go="${prev}">← ${esc(S.projects[prev].short)}</button>
         ${sb}
         <button class="btn" type="button" data-go="${next}">${esc(S.projects[next].short)} →</button>
-      </div>`;
+      </div>
+      ${p.gallery && p.gallery.length ? `
+      <div class="modal-gallery">
+        <p class="eyebrow">${p.gallery.length} photos · clique pour agrandir</p>
+        <div class="gal-grid">${p.gallery.map((src, k) => `<button class="gal-item" type="button" data-gal="${k}" aria-label="Photo ${k + 1} sur ${p.gallery.length}"><img src="${esc(src)}" alt="" loading="lazy" /></button>`).join('')}</div>
+      </div>` : ''}`;
+    currentGallery = p.gallery && p.gallery.length ? p.gallery : null;
     if (modal.hidden) lastFocus = document.activeElement;
     showModal();
   }
@@ -364,6 +371,8 @@
   modal.addEventListener('click', (e) => {
     const go = e.target.closest('[data-go]');
     if (go) return openProject(+go.dataset.go);
+    const gal = e.target.closest('[data-gal]');
+    if (gal && currentGallery) return openLightbox(currentGallery, +gal.dataset.gal);
     if (e.target.closest('[data-close]')) closeModal();
   });
 
@@ -463,19 +472,49 @@
   });
   updateStrip();
 
+  // Visionneuse : une planche seule, ou une série de photos avec ← →
   const lightbox = $('#lightbox');
-  function openLightbox(src, title) {
+  let lbList = [], lbIndex = 0, lbTitle = '';
+  function showLb() {
     const img = $('#lightbox-img');
-    img.src = src; img.alt = `Planche — ${title}`;
+    img.src = lbList[lbIndex];
+    img.alt = lbList.length > 1 ? `Photo ${lbIndex + 1} sur ${lbList.length}` : `Planche — ${lbTitle}`;
+    $('#lb-count').textContent = lbList.length > 1 ? `${lbIndex + 1} / ${lbList.length}` : '';
+    lightbox.classList.toggle('is-single', lbList.length < 2);
+  }
+  function openLightbox(src, start) {
+    // openLightbox('planche.jpg', 'Titre') ou openLightbox([photos], index)
+    if (Array.isArray(src)) { lbList = src; lbIndex = start || 0; lbTitle = ''; }
+    else { lbList = [src]; lbIndex = 0; lbTitle = start || ''; }
+    showLb();
     lightbox.hidden = false;
     document.body.classList.add('no-scroll');
+  }
+  function stepLb(d) {
+    if (lbList.length < 2) return;
+    lbIndex = (lbIndex + d + lbList.length) % lbList.length;
+    showLb();
   }
   function closeLightbox() {
     if (lightbox.hidden) return;
     lightbox.hidden = true;
     if (modal.hidden) document.body.classList.remove('no-scroll');
   }
-  lightbox.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    const nav = e.target.closest('[data-lb]');
+    if (nav) return stepLb(+nav.dataset.lb);
+    if (e.target.id === 'lightbox-img' && lbList.length > 1) return stepLb(1);
+    closeLightbox();
+  });
+  // glisser au doigt pour passer d'une photo à l'autre
+  let lbTouch = null;
+  lightbox.addEventListener('touchstart', (e) => { lbTouch = e.touches[0].clientX; }, { passive: true });
+  lightbox.addEventListener('touchend', (e) => {
+    if (lbTouch === null) return;
+    const dx = e.changedTouches[0].clientX - lbTouch;
+    if (Math.abs(dx) > 50) stepLb(dx < 0 ? 1 : -1);
+    lbTouch = null;
+  });
 
   /* ================= SERVICES ================= */
   const icons = {
@@ -623,6 +662,7 @@
 
   /* ================= CLAVIER ================= */
   addEventListener('keydown', (e) => {
+    if (!lightbox.hidden && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) return stepLb(e.key === 'ArrowRight' ? 1 : -1);
     if (e.key !== 'Escape') return;
     if (!lightbox.hidden) closeLightbox();
     else if (!modal.hidden) closeModal();

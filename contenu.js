@@ -115,7 +115,24 @@ const SITE = {
       client: 'Particuliers', year: '2025', role: 'Photographie, retouche', duration: '',
       description: "Couverture d'un mariage : les préparatifs, les invités et les moments forts de la journée, puis tri et retouche de la série dans Lightroom.",
       tags: ['Mariage', 'Événementiel'], tools: ['Lightroom'],
-      video: '', preview: '', cover: '', gallery: [], colors: ['#c79081', '#dfa579'] },
+      video: '', preview: '',
+      cover: 'assets/projets/mariage/mariage-02.jpg',   // photo de la carte
+      gallery: [
+        'assets/projets/mariage/mariage-01.jpg',
+        'assets/projets/mariage/mariage-02.jpg',
+        'assets/projets/mariage/mariage-03.jpg',
+        'assets/projets/mariage/mariage-04.jpg',
+        'assets/projets/mariage/mariage-05.jpg',
+        'assets/projets/mariage/mariage-06.jpg',
+        'assets/projets/mariage/mariage-07.jpg',
+        'assets/projets/mariage/mariage-08.jpg',
+        'assets/projets/mariage/mariage-09.jpg',
+        'assets/projets/mariage/mariage-10.jpg',
+        'assets/projets/mariage/mariage-11.jpg',
+        'assets/projets/mariage/mariage-12.jpg',
+        'assets/projets/mariage/mariage-13.jpg'
+      ],
+      colors: ['#c79081', '#dfa579'] },
 
     { id: 'bde-mirage', title: 'Vidéos du BDE MMI Mirage', short: 'BDE Mirage', category: 'scolaire', type: 'Vidéo',
       client: 'BDE MMI Mirage', year: '2025', role: 'Producteur de contenu vidéo', duration: '',
