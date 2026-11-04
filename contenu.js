@@ -141,8 +141,8 @@ const SITE = {
       tags: ['Publicité', 'Monde virtuel'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/qoHD0Qa0w3o', preview: '', cover: '', colors: ['#2c3e50', '#c94b4b'] },
     { id: 'autisme', title: "Comprendre l'autisme", short: "Comprendre l'autisme", category: 'scolaire', type: 'Vidéo',
-      client: 'BUT MMI — IUT de Blois (2e année)', year: '2025-26', role: 'Tournage, montage', duration: '',
-      description: "Projet de deuxième année du BUT MMI : une vidéo simple pour faire comprendre au grand public ce qu'est l'autisme.",
+      client: 'BUT MMI — IUT de Blois (2e année)', year: '2025-26', role: "Toute la vidéo, de l'écriture au montage", duration: '',
+      description: "Projet de deuxième année du BUT MMI : une vidéo simple pour faire comprendre au grand public ce qu'est l'autisme. J'ai tout réalisé, de l'écriture au montage.",
       tags: ['Sensibilisation', 'Pédagogie'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/DSiDXvcQu5U', preview: '', cover: '', colors: ['#1e3c72', '#2a9d8f'] },
 
