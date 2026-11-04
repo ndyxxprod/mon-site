@@ -134,11 +134,6 @@ const SITE = {
       ],
       colors: ['#c79081', '#dfa579'] },
 
-    { id: 'bde-mirage', title: 'Vidéos du BDE MMI Mirage', short: 'BDE Mirage', category: 'scolaire', type: 'Vidéo',
-      client: 'BDE MMI Mirage', year: '2025', role: 'Producteur de contenu vidéo', duration: '',
-      description: "Production des vidéos du BDE de la formation MMI : événements, soirées et contenus pour les réseaux.",
-      tags: ['Événementiel', 'Réseaux sociaux'], tools: ['DaVinci Resolve', 'CapCut Pro'],
-      video: '', preview: '', cover: '', colors: ['#8e2de2', '#ff3d9a'] },
 
     { id: 'court-metrage', title: 'Court-métrage — BUT MMI', short: 'Court-métrage', category: 'scolaire', type: 'Vidéo',
       client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '',
