@@ -309,6 +309,7 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
 }
 .fan-list { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; }
 .fan-item {
+  will-change: transform;
   position: absolute; left: 50%; top: clamp(20px, 3vw, 40px);
   width: var(--cw); margin-left: calc(var(--cw) / -2);
   transform-origin: 50% var(--R);
@@ -545,11 +546,14 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
   margin-top: clamp(110px, 14vw, 200px);
   padding-block: clamp(100px, 13vw, 180px) clamp(72px, 9vw, 120px); padding-inline: 0;
   color: #fff; border-radius: 36px; overflow: hidden;
-  background: linear-gradient(120deg, var(--c1), var(--c2), color-mix(in oklab, var(--c1) 55%, #000), var(--c2), var(--c1));
-  background-size: 300% 300%;
-  animation: gradient 14s ease-in-out infinite;
+  position: relative; isolation: isolate; background: var(--c1);
 }
-@keyframes gradient { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.contact::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 300%; z-index: -1; pointer-events: none;
+  background: linear-gradient(120deg, var(--c1), var(--c2), color-mix(in oklab, var(--c1) 55%, #000), var(--c2), var(--c1));
+  will-change: transform; animation: gradient 14s ease-in-out infinite alternate;
+}
+@keyframes gradient { from { transform: translateX(0); } to { transform: translateX(-66.666%); } }
 .contact-inner { padding: 0 var(--gutter); }
 .contact .eyebrow { color: rgba(255, 255, 255, 0.8); }
 .contact-title {
@@ -751,10 +755,12 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
   .palette-label { display: none; }
 }
 
+.is-offscreen *, .is-offscreen *::before, .is-offscreen *::after, .is-offscreen::before { animation-play-state: paused !important; }
+
 /* ---------- Mode Safari (allégé automatiquement) ---------- */
 .safe .cursor { display: none !important; }
 .safe .fan-card { transition: none; }
-.safe .grain, .safe .contact, .safe .hero-status::before { animation: none; }
+.safe .grain, .safe .contact::before, .safe .hero-status::before { animation: none; }
 .safe .manifesto-text span { text-shadow: none; }
 .safe .menu { transition: none; }
 
@@ -764,7 +770,7 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
 .lite .hero-bg, .no-canvas .hero-bg { background: radial-gradient(60% 70% at 25% 30%, color-mix(in oklab, var(--c1) 70%, transparent), transparent), radial-gradient(50% 60% at 80% 40%, color-mix(in oklab, var(--c2) 60%, transparent), transparent), var(--bg); }
 .lite .hero-title .word { transform: none; transition: none; }
 .lite .manifesto-text span { color: var(--lit, var(--fg)); text-shadow: none; }
-.lite .contact { animation: none; }
+.lite .contact::before { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }

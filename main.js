@@ -88,6 +88,12 @@
     </div>`;
   }
 
+  // Visible à l'écran ? (les animations en boucle s'arrêtent quand leur section est hors de l'écran)
+  const watchVisible = (el, cb) => {
+    if (!el || !('IntersectionObserver' in window)) return cb(true);
+    new IntersectionObserver((e) => cb(e[0].isIntersecting), { rootMargin: '100px' }).observe(el);
+  };
+
   /* ================= ACCUEIL ================= */
   $('#hero-kicker').textContent = `${S.role} — ${S.city}`;
   $('#hero-first').textContent = S.firstName;
@@ -110,8 +116,17 @@
   const tc = $('#timecode');
   const toTC = (f) => `${pad(Math.floor(f / 90000))}:${pad(Math.floor(f / 1500) % 60)}:${pad(Math.floor(f / 25) % 60)}:${pad(f % 25)}`;
   const t0 = performance.now();
+  let heroOn = true, lastFrame = -1;
+  watchVisible($('#hero'), (v) => { heroOn = v; });
+  // les petites animations CSS (grain, REC, flèches…) s'arrêtent quand leur section n'est pas à l'écran
+  ['hero', 'storyboards', 'contact'].forEach((id) => watchVisible(document.getElementById(id), (v) => {
+    document.getElementById(id).classList.toggle('is-offscreen', !v);
+  }));
   (function tick() {
-    tc.textContent = toTC(Math.floor(((performance.now() - t0) / 1000) * 25));
+    if (heroOn) {
+      const f = Math.floor(((performance.now() - t0) / 1000) * 25);
+      if (f !== lastFrame) { tc.textContent = toTC(f); lastFrame = f; }
+    }
     requestAnimationFrame(tick);
   })();
 
@@ -214,11 +229,14 @@
       const w = n > 1 ? wrap(k - pos, n) : 0;
       const a = w * step;
       const ad = Math.abs(a);
-      li.style.transform = `rotate(${a.toFixed(3)}deg)`;
-      li.style.zIndex = String(100 - Math.round(ad * 2));
-      li.style.setProperty('--dim', Math.min(1, ad / (step * 3.4)).toFixed(3));
-      // les cartes qui passent d'un bout à l'autre de la boucle s'effacent
-      li.style.opacity = String(clamp((n / 2 - Math.abs(w)) / 0.6, 0, 1).toFixed(3));
+      li.style.transform = `rotate(${a.toFixed(2)}deg)`;
+      // zIndex, assombrissement et fondu : seulement quand la valeur change vraiment
+      const z = String(100 - Math.round(ad * 2));
+      const dim = Math.min(1, ad / (step * 3.4)).toFixed(2);
+      const op = clamp((n / 2 - Math.abs(w)) / 0.6, 0, 1).toFixed(2);
+      if (li._z !== z) { li.style.zIndex = z; li._z = z; }
+      if (li._dim !== dim) { li.style.setProperty('--dim', dim); li._dim = dim; }
+      if (li._op !== op) { li.style.opacity = op; li._op = op; }
     });
   }
   const nearest = (k) => { const n = fanItems().length; return k + n * Math.round((pos - k) / n); };
@@ -309,13 +327,19 @@
   let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
 
   if (finePointer) {
-    addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; cursor.classList.add('is-visible'); });
-    document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
-    (function follow() {
+    let following = false;
+    const follow = () => {
       cx += (mx - cx) * 0.35; cy += (my - cy) * 0.35;
-      cursor.style.transform = `translate(${cx}px, ${cy}px)`;
-      requestAnimationFrame(follow);
-    })();
+      cursor.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
+      if (Math.abs(mx - cx) > 0.3 || Math.abs(my - cy) > 0.3) requestAnimationFrame(follow);
+      else following = false;
+    };
+    addEventListener('mousemove', (e) => {
+      mx = e.clientX; my = e.clientY;
+      cursor.classList.add('is-visible');
+      if (!following) { following = true; requestAnimationFrame(follow); }
+    }, { passive: true });
+    document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
 
     document.addEventListener('mouseover', (e) => {
       const label = e.target.closest('[data-cursor]');

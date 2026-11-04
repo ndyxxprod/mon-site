@@ -239,16 +239,22 @@
 
   /* ================= BANDEAUX CROISÉS ================= */
   let tapeDir = 1;
+  let tapesOn = true;
+  new IntersectionObserver((e) => { tapesOn = e[0].isIntersecting; }, { rootMargin: '100px' }).observe($('.tapes'));
   if (!off.has('tapes')) $$('.tape .marquee-track').forEach((track, i) => {
     const dir = i ? 1 : -1;
-    let x = 0;
+    let x = 0, w = 0;
+    const measure = () => { w = track.scrollWidth / 2; };
+    measure();
+    addEventListener('resize', measure);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    const setX = gsap.quickSetter(track, 'x', 'px');
     gsap.ticker.add(() => {
-      const w = track.scrollWidth / 2;
-      if (!w) return;
+      if (!tapesOn || !w) return;
       if (Math.abs(vel) > 40) tapeDir = vel > 0 ? 1 : -1;
       const speed = 1.1 * (1 + Math.min(Math.abs(vel) / 220, 10));
       x = gsap.utils.wrap(-w, 0, x + dir * tapeDir * speed);
-      gsap.set(track, { x });
+      setX(x);
     });
   });
   gsap.fromTo('.tape-a', { rotate: -7 }, { rotate: -2, ease: 'none', scrollTrigger: { trigger: '.tapes', start: 'top bottom', end: 'bottom top', scrub: true } });
