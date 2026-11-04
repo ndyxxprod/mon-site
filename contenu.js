@@ -23,7 +23,7 @@ const SITE = {
   phone: '+33 7 61 52 26 26',          // vide = masqué
   status: 'Disponible pour des projets freelance',
   avatar: 'assets/avatar.jpg',
-  cv: 'assets/cv.pdf',
+  cv: 'assets/cv.pdf?v=202611041451',
 
   /* AMBIANCE DE COULEURS
      palette : celle affichée par défaut (golden, teal, neon ou lagon).
