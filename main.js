@@ -337,6 +337,7 @@
     document.dispatchEvent(new CustomEvent('modal:open', { detail: { from: wasHidden ? lastClick : null } }));
   }
   let currentGallery = null;
+  let currentVideos = null;
   function openProject(i) {
     const p = S.projects[i];
     const media = $('#modal-media');
@@ -366,12 +367,25 @@
         ${sb}
         <button class="btn" type="button" data-go="${next}">${esc(S.projects[next].short)} →</button>
       </div>
+      ${p.videos && p.videos.length > 1 ? `
+      <div class="modal-gallery">
+        <p class="eyebrow">${p.videos.length} vidéos · clique pour lancer</p>
+        <div class="vid-list">${p.videos.map((v, k) => {
+          const id = ytId(v.url);
+          return `<button class="vid-item${k === 0 ? ' is-active' : ''}" type="button" data-vid="${k}">
+            ${id ? `<img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" loading="lazy" />` : '<span class="vid-ph"></span>'}
+            <span class="vid-play">▶</span>
+            <span class="vid-title"><em>${pad(k + 1)}</em>${esc(v.title)}</span>
+          </button>`;
+        }).join('')}</div>
+      </div>` : ''}
       ${p.gallery && p.gallery.length ? `
       <div class="modal-gallery">
         <p class="eyebrow">${p.gallery.length} photos · clique pour agrandir</p>
         <div class="gal-grid">${p.gallery.map((src, k) => `<button class="gal-item" type="button" data-gal="${k}" aria-label="Photo ${k + 1} sur ${p.gallery.length}"><img src="${esc(src)}" alt="" loading="lazy" /></button>`).join('')}</div>
       </div>` : ''}`;
     currentGallery = p.gallery && p.gallery.length ? p.gallery : null;
+    currentVideos = p.videos && p.videos.length > 1 ? p.videos : null;
     if (modal.hidden) lastFocus = document.activeElement;
     showModal();
   }
@@ -389,6 +403,13 @@
   modal.addEventListener('click', (e) => {
     const go = e.target.closest('[data-go]');
     if (go) return openProject(+go.dataset.go);
+    const vid = e.target.closest('[data-vid]');
+    if (vid && currentVideos) {
+      $('#modal-media').innerHTML = playerHtml(currentVideos[+vid.dataset.vid].url);
+      $$('.vid-item', modal).forEach((b) => b.classList.toggle('is-active', b === vid));
+      $('.modal-panel', modal).scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      return;
+    }
     const gal = e.target.closest('[data-gal]');
     if (gal && currentGallery) return openLightbox(currentGallery, +gal.dataset.gal);
     if (e.target.closest('[data-close]')) closeModal();

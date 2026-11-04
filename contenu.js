@@ -103,6 +103,18 @@ const SITE = {
 
   /* PROJETS — category : 'pro' ou 'scolaire' */
   projects: [
+    /* videos : plusieurs vidéos dans la même fiche (la première sert de couverture) */
+    { id: 'ufab', title: 'UFAB 49 — Angers Basket', short: 'UFAB 49', category: 'pro', type: 'Vidéo',
+      client: 'UFAB 49 — Union Féminine Angers Basket', year: '2025-26', role: 'Tournage, montage', duration: '',
+      description: "Deux vidéos réalisées pour l'UFAB 49, le club professionnel de basket féminin d'Angers : un teaser pour promouvoir le prochain match de l'équipe, puis l'introduction du documentaire consacré à la victoire des U18 en Coupe de France.",
+      tags: ['Sport', 'Basket', 'Club pro'], tools: ['DaVinci Resolve'],
+      video: 'https://youtu.be/HxsINV4s5Nc',
+      videos: [
+        { title: 'Promotion du prochain match', url: 'https://youtu.be/HxsINV4s5Nc' },
+        { title: 'Introduction du documentaire — les U18 en Coupe de France', url: 'https://youtu.be/vF1PbpQz9M0' }
+      ],
+      preview: '', cover: '', colors: ['#ff7a1a', '#7a1f00'] },
+
     { id: 'clip-sae302', title: 'Clip musical — SAE 302', short: 'Clip SAE 302', category: 'scolaire', type: 'Vidéo',
       client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '5:27',
       description: "Clip réalisé en équipe dans le cadre de la SAE 302 : pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
