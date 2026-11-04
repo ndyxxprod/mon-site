@@ -141,11 +141,6 @@ const SITE = {
       tags: ['Publicité', 'Monde virtuel'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/qoHD0Qa0w3o', preview: '', cover: '', colors: ['#2c3e50', '#c94b4b'] },
 
-    { id: 'video-commerciale', title: 'Vidéo commerciale — BUT MMI', short: 'Vidéo commerciale', category: 'scolaire', type: 'Vidéo',
-      client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '',
-      description: "Vidéo commerciale réalisée dans le cadre du BUT MMI.",
-      tags: ['Publicité', 'Marque'], tools: ['DaVinci Resolve', 'After Effects'],
-      video: '', preview: '', cover: '', colors: ['#f7b733', '#fc4a1a'] },
 
     { id: 'youtube', title: 'Ma chaîne YouTube', short: 'YouTube', category: 'pro', type: 'Vidéo',
       client: 'Projet personnel', year: '2025', role: 'Conception, tournage, montage', duration: '',
