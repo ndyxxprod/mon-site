@@ -115,12 +115,12 @@ const SITE = {
       ],
       preview: '', cover: '', colors: ['#ff7a1a', '#7a1f00'] },
 
-    { id: 'clip-sae302', title: 'Clip musical — SAE 302', short: 'Clip SAE 302', category: 'scolaire', type: 'Vidéo',
-      client: 'BUT MMI — IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '5:27',
-      description: "Clip réalisé en équipe dans le cadre de la SAE 302 : pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
-      tags: ['Clip', 'Musique', "Projet d'équipe"], tools: ['DaVinci Resolve'], storyboard: 'sb-clip',
+    { id: 'clip-sae302', title: 'Clip musical', short: 'Clip musical', category: 'scolaire', type: 'Vidéo',
+      client: 'The Banshee — projet BUT MMI, IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '5:27',
+      description: "Clip réalisé en équipe dans le cadre d'un projet de l'IUT, mais pour un vrai client : le groupe The Banshee. Pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
+      tags: ['Clip', 'Musique', 'Client réel'], tools: ['DaVinci Resolve'], storyboard: 'sb-clip',
       video: 'https://youtu.be/x39LFhQWqGU',   // le clip (lien YouTube / Vimeo, ou 'assets/videos/clip.mp4')
-      preview: '', cover: '', colors: ['#3a1c71', '#d76d77'] },
+      preview: '', cover: 'assets/projets/clip/clip-cover.jpg', colors: ['#3a1c71', '#d76d77'] },
 
 
     { id: 'mariage', title: 'Mariage', short: 'Mariage', category: 'pro', type: 'Photo',
@@ -172,7 +172,7 @@ const SITE = {
      vidéo de ce projet (champ video du projet, ex. lien YouTube). */
   storyboards: [
     {
-      id: 'sb-clip', title: 'Clip SAE 302', project: 'clip-sae302', date: '2025',
+      id: 'sb-clip', title: 'Clip musical', project: 'clip-sae302', date: '2025',
       page: 'assets/storyboards/clip-sae302-planche.jpg',
       description: "Découpage du clip minute par minute : le groupe joue pendant qu'une jeune fille suit une silhouette jusque dans la forêt. Chaque plan précise le cadrage et le support caméra (DJI, magic arm, trépied, main).",
       frames: [
