@@ -31,7 +31,7 @@ const SITE = {
      essayer les palettes en direct. Mets false une fois ton choix fait.
      c1 / c2 : couleurs principales (fond animé de l'accueil, dégradés, contact)
      c3 : couleur claire (section Services)                                     */
-  palette: 'golden',
+  palette: 'lagon',
   showPalettePicker: true,
   palettes: {
     golden: { name: 'Golden hour', c1: '#ff5a1f', c2: '#ff1f6d', c3: '#ffb627' },
