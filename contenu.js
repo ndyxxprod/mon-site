@@ -115,9 +115,9 @@ const SITE = {
       preview: '', cover: '', colors: ['#ff7a1a', '#7a1f00'] },
 
     { id: 'clip-sae302', title: 'Clip musical', short: 'Clip musical', category: 'scolaire', type: 'Vidéo',
-      client: 'The Banshee — projet BUT MMI, IUT de Blois', year: '2025', role: 'Tournage, montage', duration: '5:27',
-      description: "Clip réalisé en équipe dans le cadre d'un projet de l'IUT, mais pour un vrai client : le groupe The Banshee. Pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
-      tags: ['Clip', 'Musique', 'Client réel'], tools: ['DaVinci Resolve'], storyboard: 'sb-clip',
+      client: 'The Banshee — projet BUT MMI, IUT de Blois', year: '2025', role: 'Réalisateur, chef de production, cadreur', duration: '5:27',
+      description: "Clip réalisé dans le cadre d'un projet de l'IUT, mais pour un vrai client : le groupe The Banshee. J'en étais le réalisateur et le chef de production : j'ai assuré seul tout le tournage, puis supervisé la post-production en échangeant avec le monteur, le directeur artistique et l'étalonneur. Pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
+      tags: ['Clip', 'Musique', 'Client réel'], tools: [], storyboard: 'sb-clip',
       video: 'https://youtu.be/x39LFhQWqGU',   // le clip (lien YouTube / Vimeo, ou 'assets/videos/clip.mp4')
       preview: '', cover: 'assets/projets/clip/clip-cover.jpg', colors: ['#3a1c71', '#d76d77'] },
 
