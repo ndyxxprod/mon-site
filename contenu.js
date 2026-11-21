@@ -145,7 +145,7 @@ const SITE = {
       ],
       colors: ['#c79081', '#dfa579'] },
     { id: 'intercampus', title: 'Aftermovie Intercampus', short: 'Intercampus', category: 'pro', type: 'Vidéo',
-      client: 'Soirée Intercampus', year: '2025-26', role: 'Tournage, montage', duration: '',
+      client: 'Fédération des étudiants de Blois', year: '2025-26', role: 'Tournage, montage', duration: '',
       description: "Aftermovie de la soirée Intercampus. La mission : capturer l'ambiance et la festivité de l'événement, puis les retracer dans une vidéo rythmée qui fait revivre la soirée du début à la fin.",
       tags: ['Aftermovie', 'Événementiel', 'Soirée'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/vIWecsF3SrU', preview: '', cover: '', colors: ['#7b2ff7', '#f107a3'] },
