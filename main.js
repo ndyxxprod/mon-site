@@ -171,7 +171,7 @@
     const [c1, c2] = p.colors || ['#333', '#111'];
     return `
     <li class="fan-item" data-category="${esc(p.category)}">
-      <button class="project-row fan-card${p.coverFit === 'contain' ? ' fc-contain' : ''}${p.coverHasTitle ? ' fc-notitle' : ''}" type="button" data-index="${i}" aria-label="${esc(p.title)} — voir le projet"
+      <button class="project-row fan-card${p.coverHasTitle ? ' fc-notitle' : ''}" type="button" data-index="${i}" aria-label="${esc(p.title)} — voir le projet"
         style="--p1:${c1};--p2:${c2}">
         ${p.cover ? `<img class="fc-cover" src="${esc(p.cover)}" alt="" loading="lazy" draggable="false"${fallbackAttr(p)} />` : ''}
         ${p.preview ? `<video class="fc-cover fc-video" src="${esc(p.preview)}" muted loop playsinline preload="none"></video>` : ''}

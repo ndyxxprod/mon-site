@@ -336,8 +336,6 @@ body.is-ready .hero-title .word, .has-anim .hero-title .word { transform: none; 
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 35%, transparent 45%, color-mix(in oklab, var(--p1) 70%, #000) 100%);
 }
 /* Couverture montrée en entier (16:9) au milieu de la carte, sans recadrage ni titre en double */
-.fan-card.fc-contain .fc-cover { inset: 17% 0 auto 0; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
-.fan-card.fc-contain::before { background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 30%, transparent 70%, color-mix(in oklab, var(--p1) 70%, #000) 100%); }
 .fan-card.fc-notitle .fc-title { display: none; }
 .fan-card.fc-notitle .fc-kicker { margin-bottom: 10px; }
 .fc-video { opacity: 0; transition: opacity 0.4s; }

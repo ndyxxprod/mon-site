@@ -148,8 +148,7 @@ const SITE = {
       client: 'Fédération des étudiants de Blois', year: '2025-26', role: 'Tournage, montage', duration: '',
       description: "Aftermovie de la soirée Intercampus. La mission : capturer l'ambiance et la festivité de l'événement, puis les retracer dans une vidéo rythmée qui fait revivre la soirée du début à la fin.",
       tags: ['Aftermovie', 'Événementiel', 'Soirée'], tools: ['DaVinci Resolve'],
-      video: 'https://youtu.be/vIWecsF3SrU', preview: '', cover: 'assets/projets/intercampus/cover.jpg',
-      coverFit: 'contain',   // image entière au milieu de la carte (au lieu d'être recadrée)
+      video: 'https://youtu.be/vIWecsF3SrU', preview: '', cover: 'assets/projets/intercampus/cover-card.jpg',   // image 3:4 : la couverture + son fond étendu
       coverHasTitle: true,   // l'image contient déjà le titre : on ne le répète pas sur la carte
       colors: ['#7b2ff7', '#f107a3'] },
 
