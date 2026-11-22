@@ -61,7 +61,7 @@ const SITE = {
   ],
 
   /* ACCUEIL */
-  heroLines: ['Ndimby', 'Vidéaste', 'Freelance'],
+  heroLines: ['Ndyxx', 'Prod'],
   /* Photos autour du titre : une par projet, cliquables (bulle « Voir »).
      slot : f1 à f6 (leur place)   p : le projet ouvert   img : la photo (sinon la couverture du projet) */
   heroPhotos: [

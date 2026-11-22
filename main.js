@@ -109,6 +109,7 @@
     const lines = S.heroLines && S.heroLines.length ? S.heroLines : [S.firstName];
     $('#hero-title').innerHTML = lines.map((l, i) => `<span class="line"><span class="word" style="--i:${i}">${esc(l)}</span></span>`).join('');
     $('#hero-title').setAttribute('aria-label', lines.join(' '));
+    $('#hero-title').classList.toggle('two-lines', lines.length <= 2);
 
     /* ---------- Photos autour du titre : une par projet, cliquables ---------- */
     (() => {

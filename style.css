@@ -177,6 +177,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   margin: 0; font-family: var(--display); font-weight: 400; text-transform: uppercase; color: var(--fg);
   font-size: clamp(76px, min(17vw, 27vh), 300px); line-height: 0.84; letter-spacing: -0.015em;
 }
+.hero-title.two-lines { font-size: clamp(90px, min(26vw, 38vh), 420px); }
 .hero-title .line { display: block; overflow: hidden; padding: 0.12em 0 0.05em; margin: -0.12em 0 -0.05em; }
 .hero-title .word { display: inline-block; transform: translateY(108%); animation: rise-in 1.15s var(--ease) forwards; animation-delay: calc(var(--i) * 0.13s + 0.1s); }
 @keyframes rise-in { to { transform: none; } }
@@ -542,6 +543,7 @@ body[data-page='works'] { background: var(--paper); }
   .nav-links { display: none; }
   .nav-burger { display: block; }
   .hero-title { font-size: clamp(72px, 22vw, 150px); }
+  .hero-title.two-lines { font-size: clamp(90px, 34vw, 220px); }
   :root { --tl-h: 18px; --tl-pr: 4px; }
   .f1 { left: 4%; top: 12%; width: 29vw; }
   .f3 { left: auto; right: 4%; top: 15%; width: 38vw; height: auto; aspect-ratio: 16 / 10; }
