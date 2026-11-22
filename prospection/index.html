@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0f766e" />
+  <title>Prospection — NDYXX PROD</title>
+  <link rel="stylesheet" href="style.css?v=202611222342" />
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand"><span class="brand-dot"></span><div><b>NDYXX PROD</b><small>Prospection</small></div></div>
+    <nav class="nav" id="nav">
+      <button data-act="nav" data-view="dashboard"><i>◧</i><span>Tableau de bord</span><em id="nb-due" hidden></em></button>
+      <button data-act="nav" data-view="prospects"><i>☰</i><span>Prospects</span><em id="nb-all"></em></button>
+      <button data-act="nav" data-view="stats"><i>▥</i><span>Statistiques</span></button>
+      <button data-act="nav" data-view="settings"><i>⚙</i><span>Réglages</span></button>
+    </nav>
+    <p class="side-note">Rien n'est envoyé automatiquement : ici, tu notes ce que tu fais.<br />Données enregistrées dans ce navigateur.</p>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <h1 id="view-title">Tableau de bord</h1>
+      <button class="btn primary" data-act="new">+ Nouveau prospect</button>
+    </header>
+    <main id="view"></main>
+  </div>
+</div>
+
+<div class="drawer" id="drawer" hidden>
+  <div class="drawer-bg" data-act="close"></div>
+  <aside class="drawer-panel" id="drawer-panel" role="dialog" aria-modal="true"></aside>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<input type="file" id="file-import" accept=".json,application/json" hidden />
+<script src="app.js?v=202611222342"></script>
+</body>
+</html>

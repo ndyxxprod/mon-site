@@ -1,0 +1,9 @@
+PROSPECTION — mode d'emploi
+===========================
+Adresse : https://ndyxxprod.github.io/mon-site/prospection/
+
+- Tes données sont enregistrées DANS TON NAVIGATEUR (rien n'est stocké sur GitHub).
+  Fais une sauvegarde (Réglages > Exporter) de temps en temps.
+- Rien n'est jamais envoyé automatiquement : tu envoies tes messages toi-même,
+  puis tu les notes dans l'historique du prospect.
+- Fichiers : index.html (page), style.css (apparence), app.js (le fonctionnement).
