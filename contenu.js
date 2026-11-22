@@ -122,8 +122,8 @@ const SITE = {
       preview: '', cover: 'assets/projets/clip/clip-cover.jpg', colors: ['#3a1c71', '#d76d77'] },
 
 
-    { id: 'mariage', title: 'Mariage', short: 'Mariage', category: 'pro', type: 'Photo',
-      client: 'Particuliers', year: '2025', role: 'Photographie, retouche', duration: '',
+    { id: 'mariage', title: 'Haja & Nancy', short: 'Haja & Nancy', category: 'pro', type: 'Photo',
+      client: 'Particuliers', year: '2026', role: 'Photographie, retouche', duration: '',
       description: "Couverture d'un mariage : les préparatifs, les invités et les moments forts de la journée, puis tri et retouche de la série dans Lightroom.",
       tags: ['Mariage', 'Événementiel'], tools: ['Lightroom'],
       video: '', preview: '',
