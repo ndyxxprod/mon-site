@@ -72,6 +72,8 @@
     return m ? m[1] : '';
   }
   S.projects.forEach((p) => {
+    // plusieurs séries de photos : la galerie à plat sert à la visionneuse
+    if (p.galleries && p.galleries.length) p.gallery = p.galleries.flatMap((g) => g.photos);
     const id = ytId(p.video);
     if (!p.cover && id) { p.cover = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`; p.coverFallback = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
   });
@@ -414,7 +416,11 @@
       ${p.gallery && p.gallery.length ? `
       <div class="modal-gallery">
         <p class="eyebrow">${p.gallery.length} photos · clique pour agrandir</p>
-        <div class="gal-grid">${p.gallery.map((src, k) => `<button class="gal-item" type="button" data-gal="${k}" aria-label="Photo ${k + 1} sur ${p.gallery.length}"><img src="${esc(src)}" alt="" loading="lazy" /></button>`).join('')}</div>
+        ${(p.galleries && p.galleries.length ? p.galleries : [{ title: '', photos: p.gallery }]).map((g, gi, all) => {
+          const start = all.slice(0, gi).reduce((n, x) => n + x.photos.length, 0);
+          return `${g.title ? `<h3 class="gal-title">${esc(g.title)}<span>${g.photos.length} photos</span></h3>` : ''}
+          <div class="gal-grid">${g.photos.map((src, k) => `<button class="gal-item" type="button" data-gal="${start + k}" aria-label="${esc(g.title || 'Photo')} — photo ${k + 1} sur ${g.photos.length}"><img src="${esc(src)}" alt="" loading="lazy" /></button>`).join('')}</div>`;
+        }).join('')}
       </div>` : ''}`;
     currentGallery = p.gallery && p.gallery.length ? p.gallery : null;
     currentVideos = p.videos && p.videos.length > 1 ? p.videos : null;

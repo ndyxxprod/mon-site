@@ -122,26 +122,41 @@ const SITE = {
       preview: '', cover: 'assets/projets/clip/clip-cover.jpg', colors: ['#3a1c71', '#d76d77'] },
 
 
-    { id: 'mariage', title: 'Haja & Nancy', short: 'Haja & Nancy', category: 'pro', type: 'Photo',
-      client: 'Particuliers', year: '2026', role: 'Photographie, retouche', duration: '',
-      description: "Couverture d'un mariage : les préparatifs, les invités et les moments forts de la journée, puis tri et retouche de la série dans Lightroom.",
+    { id: 'mariage', title: 'Mariages', short: 'Mariages', category: 'pro', type: 'Photo',
+      client: 'Haja & Nancy · Tolotra & Diana', year: '2026', role: 'Photographie, retouche', duration: '',
+      description: "Reportages photo de deux mariages célébrés en 2026, ceux de Haja & Nancy et de Tolotra & Diana : les préparatifs, la cérémonie, les portraits des mariés, les invités et la réception, puis tri et retouche des séries dans Lightroom.",
       tags: ['Mariage', 'Événementiel'], tools: ['Lightroom'],
       video: '', preview: '',
       cover: 'assets/projets/mariage/mariage-02.jpg',   // photo de la carte
-      gallery: [
-        'assets/projets/mariage/mariage-01.jpg',
-        'assets/projets/mariage/mariage-11.jpg',
-        'assets/projets/mariage/mariage-04.jpg',
-        'assets/projets/mariage/mariage-06.jpg',
-        'assets/projets/mariage/mariage-02.jpg',
-        'assets/projets/mariage/mariage-13.jpg',
-        'assets/projets/mariage/mariage-07.jpg',
-        'assets/projets/mariage/mariage-09.jpg',
-        'assets/projets/mariage/mariage-03.jpg',
-        'assets/projets/mariage/mariage-12.jpg',
-        'assets/projets/mariage/mariage-05.jpg',
-        'assets/projets/mariage/mariage-08.jpg',
-        'assets/projets/mariage/mariage-10.jpg'
+      /* galleries : une série par mariage (la galerie à plat est calculée toute seule) */
+      galleries: [
+        { title: 'Haja & Nancy', photos: [
+          'assets/projets/mariage/mariage-01.jpg',
+          'assets/projets/mariage/mariage-11.jpg',
+          'assets/projets/mariage/mariage-04.jpg',
+          'assets/projets/mariage/mariage-06.jpg',
+          'assets/projets/mariage/mariage-02.jpg',
+          'assets/projets/mariage/mariage-13.jpg',
+          'assets/projets/mariage/mariage-07.jpg',
+          'assets/projets/mariage/mariage-09.jpg',
+          'assets/projets/mariage/mariage-03.jpg',
+          'assets/projets/mariage/mariage-12.jpg',
+          'assets/projets/mariage/mariage-05.jpg',
+          'assets/projets/mariage/mariage-08.jpg',
+          'assets/projets/mariage/mariage-10.jpg'
+        ] },
+        { title: 'Tolotra & Diana', photos: [
+          'assets/projets/mariage2/tolotra-diana-01.jpg',
+          'assets/projets/mariage2/tolotra-diana-02.jpg',
+          'assets/projets/mariage2/tolotra-diana-03.jpg',
+          'assets/projets/mariage2/tolotra-diana-04.jpg',
+          'assets/projets/mariage2/tolotra-diana-05.jpg',
+          'assets/projets/mariage2/tolotra-diana-06.jpg',
+          'assets/projets/mariage2/tolotra-diana-07.jpg',
+          'assets/projets/mariage2/tolotra-diana-08.jpg',
+          'assets/projets/mariage2/tolotra-diana-09.jpg',
+          'assets/projets/mariage2/tolotra-diana-10.jpg'
+        ] }
       ],
       colors: ['#c79081', '#dfa579'] },
     { id: 'intercampus', title: 'Aftermovie Intercampus', short: 'Intercampus', category: 'pro', type: 'Vidéo',
