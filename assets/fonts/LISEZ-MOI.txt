@@ -1,0 +1,2 @@
+Polices Anton, DM Mono et Inter (fontsource.org), sous licence SIL Open Font License 1.1.
+Elles sont hébergées ici pour que le site ne dépende d'aucun service extérieur.

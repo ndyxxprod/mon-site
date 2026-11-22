@@ -60,6 +60,44 @@ const SITE = {
     { network: 'LinkedIn', url: 'https://www.linkedin.com/in/ndimby-ramahafadrahona-b9420635a/' }
   ],
 
+  /* ACCUEIL — photos qui apparaissent autour du titre (o : p = portrait, l = paysage) */
+  heroLines: ['Ndimby', 'Vidéaste', 'Freelance'],
+  heroImages: [
+    { src: 'assets/mini/mariage-02.jpg', o: 'p' },
+    { src: 'assets/mini/mariage-11.jpg', o: 'p' },
+    { src: 'assets/mini/mariage-12.jpg', o: 'p' },
+    { src: 'assets/mini/mariage-04.jpg', o: 'l' },
+    { src: 'assets/mini/mariage-05.jpg', o: 'l' },
+    { src: 'assets/mini/mariage-07.jpg', o: 'l' },
+    { src: 'assets/mini/tolotra-01.jpg', o: 'p' },
+    { src: 'assets/mini/tolotra-02.jpg', o: 'p' },
+    { src: 'assets/mini/tolotra-03.jpg', o: 'l' },
+    { src: 'assets/mini/tolotra-04.jpg', o: 'p' },
+    { src: 'assets/mini/tolotra-06.jpg', o: 'p' },
+    { src: 'assets/mini/tolotra-07.jpg', o: 'l' },
+    { src: 'assets/mini/tolotra-10.jpg', o: 'p' },
+    { src: 'assets/mini/intercampus-portrait.jpg', o: 'p' },
+    { src: 'assets/mini/clip-cover.jpg', o: 'l' }
+  ],
+
+  /* Phrase géante : les mots en couleur sont cliquables et montrent un projet au survol.
+     w = le mot, p = l'identifiant du projet montré. */
+  statement: [
+    'Je filme des ', { w: 'clips', p: 'clip-sae302' }, ', des ', { w: 'publicités', p: 'harmonya' },
+    ', des ', { w: 'soirées', p: 'intercampus' }, ', du ', { w: 'sport', p: 'ufab' },
+    ' et des films de ', { w: 'sensibilisation', p: 'autisme' }, '. Je photographie des ', { w: 'mariages', p: 'mariage' }, '.'
+  ],
+
+  /* Ils m'ont fait confiance : p = projet montré au survol, img = photo (facultatif) */
+  clients: [
+    { name: 'UFAB 49', kind: 'Club de basket pro', p: 'ufab' },
+    { name: 'The Banshee', kind: 'Groupe de musique', p: 'clip-sae302' },
+    { name: 'Fédération des étudiants de Blois', kind: 'Association', p: 'intercampus' },
+    { name: 'BUT MMI · IUT de Blois', kind: 'Projets d\'études', p: 'harmonya' },
+    { name: 'Haja & Nancy', kind: 'Mariage · 2026', p: 'mariage', img: 'assets/mini/mariage-02.jpg' },
+    { name: 'Tolotra & Diana', kind: 'Mariage · 2026', p: 'mariage', img: 'assets/mini/tolotra-04.jpg' }
+  ],
+
   // Grande phrase sous l'accueil (les mots s'allument au scroll)
   manifesto: "Passionné par les caméras depuis tout petit, j'ai toujours eu envie de tout capturer : les moments, les gens, les ambiances.",
 
@@ -119,7 +157,7 @@ const SITE = {
       description: "Clip réalisé dans le cadre d'un projet de l'IUT, mais pour un vrai client : le groupe The Banshee. J'en étais le réalisateur et le chef de production : j'ai assuré seul tout le tournage, puis supervisé la post-production en échangeant avec le monteur, le directeur artistique et l'étalonneur. Pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
       tags: ['Clip', 'Musique', 'Client réel'], tools: [], storyboard: 'sb-clip',
       video: 'https://youtu.be/x39LFhQWqGU',   // le clip (lien YouTube / Vimeo, ou 'assets/videos/clip.mp4')
-      preview: '', cover: 'assets/projets/clip/clip-cover.jpg', colors: ['#3a1c71', '#d76d77'] },
+      preview: '', cover: 'assets/projets/clip/clip-cover.jpg', thumb: 'assets/mini/clip-cover.jpg', colors: ['#3a1c71', '#d76d77'] },
 
 
     { id: 'mariage', title: 'Mariages', short: 'Mariages', category: 'pro', type: 'Photo',
@@ -127,6 +165,7 @@ const SITE = {
       description: "Reportages photo de deux mariages célébrés en 2026, ceux de Haja & Nancy et de Tolotra & Diana : les préparatifs, la cérémonie, les portraits des mariés, les invités et la réception, puis tri et retouche des séries dans Lightroom.",
       tags: ['Mariage', 'Événementiel'], tools: ['Lightroom'],
       video: '', preview: '',
+      thumb: 'assets/mini/mariage-02.jpg',
       cover: 'assets/projets/mariage/mariage-02.jpg',   // photo de la carte
       /* galleries : une série par mariage (la galerie à plat est calculée toute seule) */
       galleries: [
@@ -163,7 +202,7 @@ const SITE = {
       client: 'Fédération des étudiants de Blois', year: '2025-26', role: 'Tournage, montage', duration: '',
       description: "Aftermovie de la soirée Intercampus. La mission : capturer l'ambiance et la festivité de l'événement, puis les retracer dans une vidéo rythmée qui fait revivre la soirée du début à la fin.",
       tags: ['Aftermovie', 'Événementiel', 'Soirée'], tools: ['DaVinci Resolve'],
-      video: 'https://youtu.be/vIWecsF3SrU', preview: '', cover: 'assets/projets/intercampus/cover-portrait.jpg',   // image verticale (remplit toute la carte)
+      video: 'https://youtu.be/vIWecsF3SrU', preview: '', cover: 'assets/projets/intercampus/cover-portrait.jpg', thumb: 'assets/mini/intercampus-portrait.jpg',   // image verticale (remplit toute la carte)
       coverHasTitle: true,   // l'image contient déjà le titre : on ne le répète pas sur la carte
       colors: ['#7b2ff7', '#f107a3'] },
 

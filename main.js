@@ -1,8 +1,8 @@
 'use strict';
 /* ==================================================================
    PORTFOLIO NDIMBY — main.js
-   Construit la page à partir de contenu.js. Pas besoin de modifier ce fichier.
-   Les grosses animations sont dans anim.js (le site marche aussi sans).
+   Construit les pages à partir de contenu.js. Pas besoin de modifier ce fichier.
+   Pages : accueil (index.html) et projets (projets.html).
    ================================================================== */
 
 (() => {
@@ -14,10 +14,15 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const page = document.body.dataset.page;
   const fullName = `${S.firstName} ${S.lastName}`;
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch { return null; } },
     set(k, v) { try { localStorage.setItem(k, v); } catch { /* stockage indisponible */ } }
+  };
+  const watchVisible = (el, cb) => {
+    if (!el || !('IntersectionObserver' in window)) return cb(true);
+    new IntersectionObserver((e) => cb(e[0].isIntersecting), { rootMargin: '120px' }).observe(el);
   };
 
   /* ================= AMBIANCE (palette) ================= */
@@ -33,11 +38,9 @@
     const name = $('#palette-name');
     if (name) name.textContent = p.name;
     $$('.swatch').forEach((s) => s.setAttribute('aria-pressed', s.dataset.key === key));
-    document.dispatchEvent(new CustomEvent('palette:change', { detail: p }));
   }
   const savedPalette = S.showPalettePicker ? store.get('ndy-palette') : null;
   applyPalette(palettes[savedPalette] ? savedPalette : S.palette);
-
   if (S.showPalettePicker && Object.keys(palettes).length > 1) {
     const picker = $('#palette');
     $('#palette-swatches').innerHTML = Object.entries(palettes).map(([k, p]) =>
@@ -52,7 +55,7 @@
     });
   }
 
-  /* ---------- Vidéos : fichier, YouTube ou Vimeo ---------- */
+  /* ================= VIDÉOS ET IMAGES ================= */
   function embedUrl(url) {
     const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/);
     if (yt) return `https://www.youtube-nocookie.com/embed/${yt[1]}?autoplay=1&rel=0`;
@@ -65,8 +68,6 @@
     if (embed) return `<iframe src="${embed}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Lecteur vidéo"></iframe>`;
     return `<video src="${esc(url)}" controls autoplay playsinline></video>`;
   }
-
-  // Miniature YouTube : sert de couverture quand le projet n'en a pas
   function ytId(url) {
     const m = (url || '').match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/);
     return m ? m[1] : '';
@@ -74,14 +75,14 @@
   S.projects.forEach((p) => {
     // plusieurs séries de photos : la galerie à plat sert à la visionneuse
     if (p.galleries && p.galleries.length) p.gallery = p.galleries.flatMap((g) => g.photos);
+    // sans photo, la miniature YouTube sert de couverture
     const id = ytId(p.video);
     if (!p.cover && id) { p.cover = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`; p.coverFallback = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; }
   });
-  const fallbackAttr = (p) => (p.coverFallback ? ` onerror="this.onerror=null;this.src='${esc(p.coverFallback)}'"` : '');
+  const byId = (id) => S.projects.findIndex((p) => p.id === id);
 
-  /* ---------- Affiche d'un projet (couverture ou affiche générée) ---------- */
+  // Affiche générée quand il n'y a pas de photo
   function posterHtml(p, { play = false } = {}) {
-    if (p.cover) return `<img src="${esc(p.cover)}" alt="${esc(p.title)}" loading="lazy"${fallbackAttr(p)} />`;
     const [c1, c2] = p.colors || ['#333', '#111'];
     return `<div class="poster" style="--p1:${c1};--p2:${c2}">
       <div class="poster-top"><span>${esc(p.type)}</span><span>${esc(p.year)}</span></div>
@@ -89,247 +90,214 @@
       <div class="poster-title">${esc(p.short || p.title)}</div>
     </div>`;
   }
-
-  // Visible à l'écran ? (les animations en boucle s'arrêtent quand leur section est hors de l'écran)
-  const watchVisible = (el, cb) => {
-    if (!el || !('IntersectionObserver' in window)) return cb(true);
-    new IntersectionObserver((e) => cb(e[0].isIntersecting), { rootMargin: '100px' }).observe(el);
-  };
+  // Image d'un projet : vignette légère si elle existe, sinon la couverture, sinon une affiche
+  function imgHtml(p) {
+    const src = p.thumb || p.cover;
+    if (!src) return posterHtml(p);
+    // si la miniature ne charge pas : image de secours, puis on la cache (le fond de la tuile reste propre)
+    const fb = !p.thumb && p.coverFallback ? esc(p.coverFallback) : '';
+    return `<img src="${esc(src)}" alt="" loading="lazy" draggable="false" onerror="if(!this.dataset.f&&'${fb}'){this.dataset.f=1;this.src='${fb}';}else{this.style.visibility='hidden';}" />`;
+  }
 
   /* ================= ACCUEIL ================= */
-  $('#hero-kicker').textContent = `${S.role} — ${S.city}`;
-  $('#hero-first').textContent = S.firstName;
-  $('#hero-last').textContent = S.lastName;
-  $('#hero-status').textContent = S.status;
+  if (page === 'home') {
+    $('#hero-kicker').textContent = `${fullName} · ${S.city}`;
+    $('#hero-status').textContent = S.status;
+    const lines = S.heroLines && S.heroLines.length ? S.heroLines : [S.firstName];
+    $('#hero-title').innerHTML = lines.map((l, i) => `<span class="line"><span class="word" style="--i:${i}">${esc(l)}</span></span>`).join('');
+    $('#hero-title').setAttribute('aria-label', lines.join(' '));
 
-  const actions = [`<a class="btn btn-light" href="#projets">Voir les projets <span>→</span></a>`];
-  if (S.showreel && S.showreel.video) {
-    actions.unshift(`<button class="btn" id="showreel-btn" type="button">▶ Voir le showreel</button>`);
-    if (!embedUrl(S.showreel.video)) {
-      $('#hero-bg').insertAdjacentHTML('afterbegin', `<video src="${esc(S.showreel.video)}" autoplay muted loop playsinline></video>`);
-      document.documentElement.classList.add('has-reel');
-    }
-  } else {
-    actions.push(`<a class="btn" href="#contact">Me contacter</a>`);
-  }
-  $('#hero-actions').innerHTML = actions.join('');
+    /* ---------- Photos qui apparaissent autour du titre ---------- */
+    (() => {
+      const wrap = $('#hero-floats');
+      const pool = (S.heroImages || []).slice();
+      if (!wrap || !pool.length) return;
+      const slots = $$('.float', wrap).filter((s) => getComputedStyle(s).display !== 'none');
+      const shown = new Set();
+      let heroOn = true;
+      watchVisible($('#hero'), (v) => { heroOn = v; });
+      const pick = (o) => {
+        const same = pool.filter((i) => i.o === o);
+        const fresh = same.filter((i) => !shown.has(i.src));
+        const from = fresh.length ? fresh : same;
+        return from[Math.floor(Math.random() * from.length)];
+      };
+      function show(slot) {
+        const next = pick(slot.dataset.o);
+        if (!next) return;
+        if (slot._src) shown.delete(slot._src);
+        slot._src = next.src; shown.add(next.src);
+        const pre = new Image();
+        pre.onload = () => { $('img', slot).src = next.src; slot.classList.add('is-on'); };
+        pre.src = next.src;
+      }
+      function schedule(slot, ms) {
+        if (reduceMotion) return;
+        setTimeout(() => {
+          if (!heroOn) return schedule(slot, 1500);
+          slot.classList.remove('is-on');
+          setTimeout(() => { show(slot); schedule(slot); }, 450);
+        }, ms || 3300 + Math.random() * 2400);
+      }
+      slots.forEach((slot, k) => setTimeout(() => { show(slot); schedule(slot, 3600 + k * 500); }, 500 + k * 420));
+    })();
 
-  // Timecode du viseur (25 images par seconde)
-  const tc = $('#timecode');
-  const toTC = (f) => `${pad(Math.floor(f / 90000))}:${pad(Math.floor(f / 1500) % 60)}:${pad(Math.floor(f / 25) % 60)}:${pad(f % 25)}`;
-  const t0 = performance.now();
-  let heroOn = true, lastFrame = -1;
-  watchVisible($('#hero'), (v) => { heroOn = v; });
-  // les petites animations CSS (grain, REC, flèches…) s'arrêtent quand leur section n'est pas à l'écran
-  ['hero', 'storyboards', 'contact'].forEach((id) => watchVisible(document.getElementById(id), (v) => {
-    document.getElementById(id).classList.toggle('is-offscreen', !v);
-  }));
-  (function tick() {
-    if (heroOn) {
-      const f = Math.floor(((performance.now() - t0) / 1000) * 25);
-      if (f !== lastFrame) { tc.textContent = toTC(f); lastFrame = f; }
-    }
-    requestAnimationFrame(tick);
-  })();
+    /* ---------- Projets sélectionnés : bandeau qui défile ---------- */
+    (() => {
+      const track = $('#work-track');
+      const shapes = ['l', 'l', 'p', 'p', 'l', 'l', 's'];
+      const drops = [70, 0, 120, 30, 90, 10, 60];
+      const one = (p, i, clone) => `
+        <li class="tile tile-${shapes[i % shapes.length]}" style="--dy:${drops[i % drops.length]}px"${clone ? ' aria-hidden="true"' : ''}>
+          <button class="tile-btn" type="button" data-index="${i}" data-cursor="Voir"${clone ? ' tabindex="-1"' : ''} aria-label="${esc(p.title)} — voir le projet">
+            <span class="tile-img">${imgHtml(p)}</span>
+            <span class="tile-cap"><span>${esc(p.short || p.title)}</span><span>${esc(p.year)}</span></span>
+          </button>
+        </li>`;
+      track.innerHTML = S.projects.map((p, i) => one(p, i, false)).join('') + S.projects.map((p, i) => one(p, i, true)).join('');
+      track.addEventListener('click', (e) => {
+        const b = e.target.closest('.tile-btn');
+        if (b) openProject(+b.dataset.index);
+      });
+      const section = $('#selection');
+      watchVisible(section, (v) => section.classList.toggle('is-offscreen', !v));
+    })();
 
-  /* ================= MANIFESTE ================= */
-  // Chaque mot passe du flou au net (mise au point) et prend la couleur du dégradé
-  const manifesto = $('#manifesto-text');
-  const mWords = S.manifesto.split(/\s+/);
-  manifesto.innerHTML = mWords.map((w, i) => {
-    const k = i / Math.max(1, mWords.length - 1);
-    const mix = k < 0.5
-      ? `color-mix(in oklab, var(--c2) ${Math.round(k * 200)}%, var(--fg))`
-      : `color-mix(in oklab, var(--c1) ${Math.round((k - 0.5) * 200)}%, var(--c2))`;
-    return `<span style="--lit:${mix}">${esc(w)} </span>`;
-  }).join('');
-  const words = $$('span', manifesto);
-  function lightWords() {
-    const r = manifesto.getBoundingClientRect();
-    const vh = innerHeight;
-    const progress = clamp((vh * 0.85 - r.top) / (r.height + vh * 0.35), 0, 1);
-    const lit = Math.round(progress * words.length);
-    words.forEach((w, i) => w.classList.toggle('is-lit', i < lit));
-  }
+    /* ---------- Phrase géante : un aperçu suit la souris ---------- */
+    (() => {
+      const st = $('#statement');
+      st.innerHTML = (S.statement || []).map((t) => (typeof t === 'string'
+        ? esc(t)
+        : `<button class="kw" type="button" data-p="${esc(t.p)}">${esc(t.w)}</button>`)).join('');
+      st.addEventListener('click', (e) => {
+        const kw = e.target.closest('.kw');
+        if (kw && byId(kw.dataset.p) >= 0) openProject(byId(kw.dataset.p));
+      });
+      if (!finePointer) return;
+      const pv = $('#preview');
+      let tx = 0, ty = 0, x = 0, y = 0, on = false, raf = 0;
+      const loop = () => {
+        x += (tx - x) * 0.17; y += (ty - y) * 0.17;
+        pv.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%)`;
+        raf = on || Math.abs(tx - x) > 0.5 || Math.abs(ty - y) > 0.5 ? requestAnimationFrame(loop) : 0;
+      };
+      const move = (e) => { tx = e.clientX; ty = e.clientY - 150; };
+      const kinds = $('#categories');
+      kinds.addEventListener('mousemove', move, { passive: true });
+      st.addEventListener('mouseover', (e) => {
+        const kw = e.target.closest('.kw');
+        if (!kw) return;
+        const p = S.projects[byId(kw.dataset.p)];
+        if (!p) return;
+        pv.innerHTML = imgHtml(p);
+        on = true;
+        if (!pv.classList.contains('is-visible')) { x = tx; y = ty; }
+        pv.classList.add('is-visible');
+        if (!raf) raf = requestAnimationFrame(loop);
+      });
+      st.addEventListener('mouseout', (e) => {
+        if (e.target.closest('.kw') && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.kw'))) {
+          on = false; pv.classList.remove('is-visible');
+        }
+      });
+    })();
 
-  /* ================= BANDEAUX ================= */
-  const tapeItems = (arr) => arr.map((m) => `<span>${esc(m)}</span>`).join('');
-  $('#marquee-a').innerHTML = tapeItems(S.marquee).repeat(2);
-  $('#marquee-b').innerHTML = tapeItems([...S.marquee].reverse()).repeat(2);
-
-  /* ================= PROJETS : ÉVENTAIL DE CARTES ================= */
-  // Les cartes sont posées sur un grand cercle dont le centre est sous la section.
-  // Le scroll fait tourner l'éventail ; on peut aussi le faire glisser.
-  const list = $('#project-list');
-  const fan = $('#fan');
-  $('#projects-count').textContent = `(${pad(S.projects.length)})`;
-  // Sur la carte, le client sans répéter le nom déjà écrit en gros (« UFAB 49 — … » → « … »)
-  const cardClient = (p) => {
-    const c = p.client || '';
-    const short = p.short || '';
-    return short && c.toLowerCase().startsWith(short.toLowerCase()) ? c.slice(short.length).replace(/^\s*[—–-]\s*/, '') : c;
-  };
-  list.innerHTML = S.projects.map((p, i) => {
-    const [c1, c2] = p.colors || ['#333', '#111'];
-    return `
-    <li class="fan-item" data-category="${esc(p.category)}">
-      <button class="project-row fan-card${p.coverHasTitle ? ' fc-notitle' : ''}" type="button" data-index="${i}" aria-label="${esc(p.title)} — voir le projet"
-        style="--p1:${c1};--p2:${c2}">
-        ${p.cover ? `<img class="fc-cover" src="${esc(p.cover)}" alt="" loading="lazy" draggable="false"${fallbackAttr(p)} />` : ''}
-        ${p.preview ? `<video class="fc-cover fc-video" src="${esc(p.preview)}" muted loop playsinline preload="none"></video>` : ''}
-        <span class="fc-brand"><b>NR</b><span>Ndimby<br />Ramahafadrahona</span></span>
-        <svg class="fc-seal" viewBox="0 0 200 200" aria-hidden="true">
-          <defs><path id="seal-${i}" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" /></defs>
-          <circle cx="100" cy="100" r="92" />
-          <text class="fc-seal-ring"><textPath href="#seal-${i}">Vidéaste freelance · ${esc(p.type)} · ${esc(p.year)} · Vidéaste freelance ·</textPath></text>
-        </svg>
-        <span class="fc-kicker">${esc(p.type)} · ${esc(p.tags[0] || '')}</span>
-        <span class="fc-title"><span class="roll"><span class="roll-a">${esc(p.short || p.title)}</span><span class="roll-b" aria-hidden="true">${esc(p.short || p.title)}</span></span></span>
-        <span class="fc-foot">
-          <span class="fc-year">${esc(p.year)}</span>
-          <span>${esc(cardClient(p))}</span>
-        </span>
-      </button>
-    </li>`;
-  }).join('');
-
-  // Avec très peu de projets (filtre), on répète les cartes pour que l'arc ne soit pas vide
-  function fillFan() {
-    $$('.fan-item.is-clone', list).forEach((li) => li.remove());
-    const originals = $$('.fan-item:not(.is-clone):not(.is-hidden)', list);
-    if (!originals.length) return;
-    const made = [];
-    // seulement s'il y a très peu de cartes (après un filtre) : sinon on verrait les mêmes projets en double
-    for (let k = 0; originals.length < 3 && originals.length + made.length < 5; k++) {
-      const c = originals[k % originals.length].cloneNode(true);
-      c.classList.add('is-clone');
-      c.setAttribute('aria-hidden', 'true');
-      c.querySelector('button').tabIndex = -1;
-      list.appendChild(c);
-      made.push(c);
-    }
-    document.dispatchEvent(new CustomEvent('fan:rows', { detail: made.map((li) => li.querySelector('.project-row')) }));
-  }
-  fillFan();
-  const fanItems = () => $$('.fan-item:not(.is-hidden)', list);
-  const fanGeom = () => (innerWidth < 720
-    ? { R: 760, step: 15, card: Math.min(220, innerWidth * 0.56) }
-    : { R: 1650, step: 8.6, card: 300 });
-  // pos = position de l'éventail en « cartes » (0 = première carte au centre).
-  // Il tourne tout seul en boucle ; on peut le faire glisser, il se cale ensuite sur la carte la plus proche.
-  const AUTO = reduceMotion ? 0 : 0.22;        // cartes par seconde (environ une carte toutes les 4-5 s)
-  let dragStart = null, dragMoved = false;
-  let pos = 0, speed = AUTO, snapTo = null, idleUntil = 0, hovering = false, fanVisible = true, lastT = performance.now();
-  const wrap = (v, n) => ((((v + n / 2) % n) + n) % n) - n / 2;
-  function renderFan() {
-    const { R, step, card } = fanGeom();
-    const items = fanItems();
-    const n = items.length;
-    fan.style.setProperty('--R', `${R}px`);
-    fan.style.setProperty('--cw', `${card}px`);
-    items.forEach((li, k) => {
-      const w = n > 1 ? wrap(k - pos, n) : 0;
-      const a = w * step;
-      const ad = Math.abs(a);
-      li.style.transform = `rotate(${a.toFixed(2)}deg)`;
-      // zIndex, assombrissement et fondu : seulement quand la valeur change vraiment
-      const z = String(100 - Math.round(ad * 2));
-      const dim = Math.min(1, ad / (step * 3.4)).toFixed(2);
-      const op = clamp((n / 2 - Math.abs(w)) / 0.6, 0, 1).toFixed(2);
-      if (li._z !== z) { li.style.zIndex = z; li._z = z; }
-      if (li._dim !== dim) { li.style.setProperty('--dim', dim); li._dim = dim; }
-      if (li._op !== op) { li.style.opacity = op; li._op = op; }
+    /* ---------- Ils m'ont fait confiance ---------- */
+    $('#client-grid').innerHTML = (S.clients || []).map((c) => {
+      const i = byId(c.p);
+      const p = S.projects[i];
+      const bg = c.img ? `<img src="${esc(c.img)}" alt="" loading="lazy" draggable="false" />` : imgHtml(p);
+      return `<li class="client">
+        <button class="client-btn" type="button" data-index="${i}" aria-label="${esc(c.name)} — voir le projet">
+          <span class="client-bg">${bg}</span>
+          <span class="client-name">${esc(c.name)}</span>
+          <span class="client-kind">${esc(c.kind)}</span>
+        </button>
+      </li>`;
+    }).join('');
+    $('#client-grid').addEventListener('click', (e) => {
+      const b = e.target.closest('.client-btn');
+      if (b && +b.dataset.index >= 0) openProject(+b.dataset.index);
     });
   }
-  const nearest = (k) => { const n = fanItems().length; return k + n * Math.round((pos - k) / n); };
-  (function fanLoop(t) {
-    const dt = Math.min(0.05, (t - lastT) / 1000 || 0);
-    lastT = t;
-    if (!dragStart) {
-      if (snapTo !== null) {
-        pos += (snapTo - pos) * 0.12;
-        if (Math.abs(snapTo - pos) < 0.002) { pos = snapTo; snapTo = null; }
-      } else {
-        const want = hovering || t < idleUntil || !fanVisible ? 0 : AUTO;
-        speed += (want - speed) * 0.04;
-        pos += speed * dt;
-      }
+
+  /* ================= PAGE PROJETS ================= */
+  if (page === 'works') {
+    const track = $('#works-track');
+    const strip = $('#works-strip');
+    track.innerHTML = S.projects.map((p, i) => `
+      <li class="wt">
+        <button class="wt-btn" type="button" data-index="${i}" data-cursor="Voir" aria-label="${esc(p.title)} — voir le projet">
+          <span class="wt-img">${imgHtml(p)}</span>
+          <span class="wt-meta"><span>${esc((p.tags && p.tags[0]) || p.type)}</span><span>${esc(p.year)}</span></span>
+          <span class="wt-title">${esc(p.short || p.title)}</span>
+        </button>
+      </li>`).join('');
+    $('#works-count').textContent = `(${pad(S.projects.length)}) projets`;
+    track.addEventListener('click', (e) => {
+      if (strip._dragged) return;
+      const b = e.target.closest('.wt-btn');
+      if (b) openProject(+b.dataset.index);
+    });
+
+    // Le mot « Projets » remplit toute la largeur de l'écran
+    const title = $('#works-title');
+    const word = $('#works-word');
+    const gutter = () => parseFloat(getComputedStyle(title).paddingLeft) || 20;
+    function fitTitle() {
+      title.style.fontSize = '100px';
+      const w = word.getBoundingClientRect().width;
+      if (w > 0) title.style.fontSize = `${(100 * (innerWidth - gutter() * 2)) / w}px`;
     }
-    if (fanVisible) renderFan();
-    requestAnimationFrame(fanLoop);
-  })(performance.now());
-  new IntersectionObserver((e) => { fanVisible = e[0].isIntersecting; }).observe(fan);
-  addEventListener('resize', renderFan);
-  const pause = (ms) => { idleUntil = performance.now() + ms; speed = 0; };
+    fitTitle();
+    addEventListener('resize', fitTitle);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitle);
 
-  // Glisser pour choisir (souris ou doigt)
-  fan.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0) return;
-    dragStart = { x: e.clientX, pos, lastX: e.clientX, lastT: performance.now(), v: 0 };
-    dragMoved = false;
-    snapTo = null;
-  });
-  addEventListener('pointermove', (e) => {
-    if (!dragStart) return;
-    const dx = e.clientX - dragStart.x;
-    if (Math.abs(dx) > 6) { dragMoved = true; fan.classList.add('is-dragging'); }
-    const { R, step } = fanGeom();
-    const pxPerCard = R * step * Math.PI / 180;
-    pos = dragStart.pos - dx / pxPerCard;
-    const now = performance.now();
-    dragStart.v = -(e.clientX - dragStart.lastX) / pxPerCard / Math.max(1, now - dragStart.lastT) * 1000;
-    dragStart.lastX = e.clientX; dragStart.lastT = now;
-  });
-  addEventListener('pointerup', () => {
-    if (!dragStart) return;
-    if (dragMoved) {
-      // un petit élan, puis la carte la plus proche se cale au centre
-      snapTo = Math.round(pos + clamp(dragStart.v * 0.25, -2, 2));
-      pause(4000);
-    }
-    dragStart = null;
-    fan.classList.remove('is-dragging');
-  });
-  fan.addEventListener('click', (e) => { if (dragMoved) { e.stopPropagation(); e.preventDefault(); dragMoved = false; } }, true);
-  $$('.fan-nav[data-dir]').forEach((b) => b.addEventListener('click', () => {
-    snapTo = Math.round(snapTo ?? pos) + +b.dataset.dir;
-    pause(5000);
-  }));
-  // au clavier, la carte qui reçoit le focus vient au centre
-  list.addEventListener('focusin', (e) => {
-    const li = e.target.closest('.fan-item');
-    if (!li) return;
-    snapTo = nearest(fanItems().indexOf(li));
-    pause(6000);
-  });
-  fan.addEventListener('mouseenter', () => { hovering = true; });
-  fan.addEventListener('mouseleave', () => { hovering = false; });
-  // extrait vidéo joué au survol si le projet en a un
-  $$('.fan-card').forEach((cardEl) => {
-    const v = $('.fc-video', cardEl);
-    if (!v) return;
-    cardEl.addEventListener('mouseenter', () => { v.play().catch(() => {}); });
-    cardEl.addEventListener('mouseleave', () => { v.pause(); });
-  });
-  list.addEventListener('mouseover', (e) => list.classList.toggle('has-hover', !!e.target.closest('.fan-card')));
-  list.addEventListener('mouseleave', () => list.classList.remove('has-hover'));
+    // Défilement horizontal : glisser, molette, flèches, barre de progression
+    const bar = $('#works-bar');
+    const progress = () => {
+      const max = strip.scrollWidth - strip.clientWidth;
+      bar.style.transform = `scaleX(${max > 0 ? clamp(strip.scrollLeft / max, 0, 1) : 1})`;
+    };
+    strip.addEventListener('scroll', progress, { passive: true });
+    addEventListener('resize', progress);
+    progress();
+    strip.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      const max = strip.scrollWidth - strip.clientWidth;
+      if ((strip.scrollLeft <= 0 && e.deltaY < 0) || (strip.scrollLeft >= max - 1 && e.deltaY > 0)) return;
+      e.preventDefault();
+      strip.scrollLeft += e.deltaY;
+    }, { passive: false });
+    $$('[data-w]').forEach((b) => b.addEventListener('click', () => {
+      const w = $('.wt', strip).offsetWidth + 40;
+      strip.scrollBy({ left: +b.dataset.w * w * 1.5, behavior: reduceMotion ? 'auto' : 'smooth' });
+    }));
+    let down = null;
+    strip.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      down = { x: e.clientX, left: strip.scrollLeft };
+      strip._dragged = false;
+    });
+    addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const dx = e.clientX - down.x;
+      if (Math.abs(dx) > 6) { strip._dragged = true; strip.classList.add('is-drag'); }
+      if (strip._dragged) strip.scrollLeft = down.left - dx;
+    });
+    addEventListener('pointerup', () => {
+      if (!down) return;
+      down = null;
+      strip.classList.remove('is-drag');
+      setTimeout(() => { strip._dragged = false; }, 0);
+    });
+  }
 
-  $$('.filter').forEach((btn) => btn.addEventListener('click', () => {
-    $$('.filter').forEach((b) => { b.classList.toggle('is-active', b === btn); b.setAttribute('aria-selected', b === btn); });
-    const f = btn.dataset.filter;
-    $$('li', list).forEach((li) => li.classList.toggle('is-hidden', f !== 'all' && li.dataset.category !== f));
-    fillFan();
-    pos = 0; snapTo = null; renderFan();
-    document.dispatchEvent(new Event('layout:change'));
-  }));
-
-  /* ---------- Curseur ---------- */
+  /* ================= CURSEUR (bulle « Voir ») ================= */
   const cursor = $('#cursor');
   const cursorLabel = $('#cursor-label');
-  let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
-
-  if (finePointer) {
-    let following = false;
+  if (finePointer && cursor) {
+    let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my, following = false;
     const follow = () => {
       cx += (mx - cx) * 0.35; cy += (my - cy) * 0.35;
       cursor.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`;
@@ -342,7 +310,6 @@
       if (!following) { following = true; requestAnimationFrame(follow); }
     }, { passive: true });
     document.addEventListener('mouseleave', () => cursor.classList.remove('is-visible'));
-
     document.addEventListener('mouseover', (e) => {
       const label = e.target.closest('[data-cursor]');
       const link = e.target.closest('a, button, .chip');
@@ -350,27 +317,25 @@
       cursor.classList.toggle('is-hover', !label && !!link);
       cursorLabel.textContent = label ? label.dataset.cursor : '';
     });
-    $$('.fan-card').forEach((c) => { c.dataset.cursor = 'Voir'; });
-    $('#sb-viewport').dataset.cursor = 'Glisser';
+    const sbv = $('#sb-viewport');
+    if (sbv) sbv.dataset.cursor = 'Glisser';
   }
 
-  /* ---------- Fiche projet ---------- */
+  /* ================= FICHE PROJET ================= */
   const modal = $('#modal');
   let lastFocus = null;
-  let lastClick = null;
-  addEventListener('pointerdown', (e) => { lastClick = { x: e.clientX, y: e.clientY }; }, true);
+  let currentGallery = null;
+  let currentVideos = null;
+  const sbHref = page === 'home' ? '#storyboards' : 'index.html#storyboards';
   function showModal() {
-    const wasHidden = modal.hidden;
     modal.hidden = false;
     document.body.classList.add('no-scroll');
     $('.modal-panel', modal).scrollTop = 0;
     $('.modal-close', modal).focus({ preventScroll: true });
-    document.dispatchEvent(new CustomEvent('modal:open', { detail: { from: wasHidden ? lastClick : null } }));
   }
-  let currentGallery = null;
-  let currentVideos = null;
   function openProject(i) {
     const p = S.projects[i];
+    if (!p) return;
     const media = $('#modal-media');
     if (p.video) {
       media.innerHTML = playerHtml(p.video);
@@ -386,7 +351,7 @@
       .filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
     const prev = (i - 1 + S.projects.length) % S.projects.length;
     const next = (i + 1) % S.projects.length;
-    const sb = p.storyboard ? `<a class="btn" href="#storyboards" data-close>Voir le storyboard</a>`
+    const extra = p.storyboard ? `<a class="btn" href="${sbHref}" data-close>Voir le storyboard</a>`
       : p.link ? `<a class="btn" href="${esc(p.link.url)}" target="_blank" rel="noopener">${esc(p.link.label)} ↗</a>` : '';
     $('#modal-body').innerHTML = `
       <div>
@@ -398,7 +363,7 @@
       <dl class="modal-specs">${specs}</dl>
       <div class="modal-nav">
         <button class="btn" type="button" data-go="${prev}">← ${esc(S.projects[prev].short)}</button>
-        ${sb}
+        ${extra}
         <button class="btn" type="button" data-go="${next}">${esc(S.projects[next].short)} →</button>
       </div>
       ${p.videos && p.videos.length > 1 ? `
@@ -434,10 +399,6 @@
     document.body.classList.remove('no-scroll');
     if (lastFocus) lastFocus.focus({ preventScroll: true });
   }
-  list.addEventListener('click', (e) => {
-    const row = e.target.closest('.project-row');
-    if (row) openProject(+row.dataset.index);
-  });
   modal.addEventListener('click', (e) => {
     const go = e.target.closest('[data-go]');
     if (go) return openProject(+go.dataset.go);
@@ -453,103 +414,7 @@
     if (e.target.closest('[data-close]')) closeModal();
   });
 
-  /* ================= STORYBOARDS ================= */
-  // Une pellicule qu'on fait glisser : présentation, plans, puis le clip final
-  let frameCount = 0;
-  $('#sb-strip').innerHTML = S.storyboards.map((sb) => {
-    const linked = sb.project ? S.projects.findIndex((p) => p.id === sb.project) : -1;
-    const project = linked >= 0 ? S.projects[linked] : null;
-    const intro = `
-      <article class="sb-card sb-intro" id="${esc(sb.id)}" data-chapter="${esc(sb.title)}">
-        <p class="sb-meta">${esc(sb.date)} · ${sb.frames.length} plans</p>
-        <h3 class="sb-title">${esc(sb.title)}</h3>
-        <p class="sb-desc">${esc(sb.description)}</p>
-        <div class="sb-actions">
-          ${sb.page ? `<button class="btn" type="button" data-page="${esc(sb.page)}" data-title="${esc(sb.title)}">Voir la planche</button>` : ''}
-          ${project ? `<button class="btn" type="button" data-open="${linked}">Regarder le clip ▶</button>` : ''}
-        </div>
-      </article>`;
-    const frames = sb.frames.map((f) => {
-      frameCount += 1;
-      return `
-      <figure class="sb-card frame" data-chapter="${esc(sb.title)}" data-n="${frameCount}">
-        <div class="frame-img${f.image ? '' : ' is-empty'}">
-          ${f.image ? `<img src="${esc(f.image)}" alt="${esc(f.framing)}" loading="lazy" draggable="false" />` : `<span>${esc(f.framing)}</span>`}
-          <span class="frame-shot">${esc(f.shot)}</span>
-        </div>
-        <figcaption class="frame-info">
-          <p class="frame-framing">${esc(f.framing)} <em>${esc(f.move)}</em></p>
-          <p class="frame-text">${esc(f.text)}</p>
-        </figcaption>
-      </figure>`;
-    }).join('');
-    // Carte finale : le clip lui-même
-    const end = project ? `
-      <article class="sb-card sb-end" data-chapter="${esc(sb.title)}" style="--p1:${(project.colors || [])[0]};--p2:${(project.colors || [])[1]}">
-        <button class="sb-play" type="button" data-open="${linked}">
-          <span class="sb-play-ring"><span>▶</span></span>
-          <span class="sb-play-label">Regarder le clip</span>
-          <span class="sb-play-sub">${project.video ? `${esc(project.title)}${project.duration ? ` · ${esc(project.duration)}` : ''}` : 'Le clip arrive bientôt en ligne'}</span>
-        </button>
-      </article>` : '';
-    return intro + frames + end;
-  }).join('');
-  $('#sb-total').textContent = pad(frameCount);
-  $('#sb-chapter').textContent = S.storyboards[0] ? S.storyboards[0].title : '';
-
-  $('#sb-strip').addEventListener('click', (e) => {
-    if (sbDragged) return;
-    const page = e.target.closest('[data-page]');
-    if (page) openLightbox(page.dataset.page, page.dataset.title);
-    const open = e.target.closest('[data-open]');
-    if (open) openProject(+open.dataset.open);
-  });
-
-  // Compteur de plans, barre de progression, flèches et glisser à la souris
-  const sbView = $('#sb-viewport');
-  const sbCards = $$('.sb-card', sbView);
-  function updateStrip() {
-    const max = sbView.scrollWidth - sbView.clientWidth;
-    $('#sb-bar').style.transform = `scaleX(${max > 0 ? sbView.scrollLeft / max : 0})`;
-    const mid = sbView.scrollLeft + sbView.clientWidth / 2;
-    let best = sbCards[0], bestD = Infinity;
-    sbCards.forEach((c) => {
-      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
-      if (d < bestD) { bestD = d; best = c; }
-    });
-    if (best) $('#sb-current').textContent = best.classList.contains('sb-end') ? 'FIN' : pad(best.dataset.n || 1);
-    document.dispatchEvent(new Event('strip:scroll'));
-  }
-  let sbTick = false;
-  sbView.addEventListener('scroll', () => {
-    if (sbTick) return;
-    sbTick = true;
-    requestAnimationFrame(() => { updateStrip(); sbTick = false; });
-  }, { passive: true });
-  $$('[data-sb]').forEach((b) => b.addEventListener('click', () => {
-    const w = (sbCards[1] || sbCards[0]).offsetWidth + 18;
-    sbView.scrollBy({ left: +b.dataset.sb * w * 2, behavior: reduceMotion ? 'auto' : 'smooth' });
-  }));
-  let sbDown = null, sbDragged = false;
-  sbView.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return;
-    sbDown = { x: e.clientX, left: sbView.scrollLeft };
-    sbDragged = false;
-  });
-  addEventListener('pointermove', (e) => {
-    if (!sbDown) return;
-    const dx = e.clientX - sbDown.x;
-    if (Math.abs(dx) > 6) { sbDragged = true; sbView.classList.add('is-drag'); }
-    if (sbDragged) sbView.scrollLeft = sbDown.left - dx;
-  });
-  addEventListener('pointerup', () => {
-    sbDown = null;
-    sbView.classList.remove('is-drag');
-    setTimeout(() => { sbDragged = false; }, 0);
-  });
-  updateStrip();
-
-  // Visionneuse : une planche seule, ou une série de photos avec ← →
+  /* ================= VISIONNEUSE ================= */
   const lightbox = $('#lightbox');
   let lbList = [], lbIndex = 0, lbTitle = '';
   function showLb() {
@@ -583,7 +448,6 @@
     if (e.target.id === 'lightbox-img' && lbList.length > 1) return stepLb(1);
     closeLightbox();
   });
-  // glisser au doigt pour passer d'une photo à l'autre
   let lbTouch = null;
   lightbox.addEventListener('touchstart', (e) => { lbTouch = e.touches[0].clientX; }, { passive: true });
   lightbox.addEventListener('touchend', (e) => {
@@ -593,38 +457,115 @@
     lbTouch = null;
   });
 
-  /* ================= SERVICES ================= */
-  const icons = {
-    film: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>',
-    camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></svg>',
-    sparkle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>',
-    pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4zM14 6l3 3"/></svg>'
-  };
-  $('#service-grid').innerHTML = S.services.map((s, i) => `
-    <div class="service">
-      <span class="service-num">${pad(i + 1)}</span>
-      ${icons[s.icon] || icons.film}
-      <h3>${esc(s.title)}</h3>
-      <p>${esc(s.text)}</p>
-    </div>`).join('');
+  /* ================= STORYBOARDS ================= */
+  if (page === 'home') {
+    let frameCount = 0;
+    $('#sb-strip').innerHTML = S.storyboards.map((sb) => {
+      const linked = sb.project ? byId(sb.project) : -1;
+      const project = linked >= 0 ? S.projects[linked] : null;
+      const intro = `
+        <article class="sb-card sb-intro" id="${esc(sb.id)}" data-chapter="${esc(sb.title)}">
+          <p class="sb-meta">${esc(sb.date)} · ${sb.frames.length} plans</p>
+          <h3 class="sb-title">${esc(sb.title)}</h3>
+          <p class="sb-desc">${esc(sb.description)}</p>
+          <div class="sb-actions">
+            ${sb.page ? `<button class="btn" type="button" data-page="${esc(sb.page)}" data-title="${esc(sb.title)}">Voir la planche</button>` : ''}
+            ${project ? `<button class="btn" type="button" data-open="${linked}">Regarder le clip ▶</button>` : ''}
+          </div>
+        </article>`;
+      const frames = sb.frames.map((f) => {
+        frameCount += 1;
+        return `
+        <figure class="sb-card frame" data-chapter="${esc(sb.title)}" data-n="${frameCount}">
+          <div class="frame-img${f.image ? '' : ' is-empty'}">
+            ${f.image ? `<img src="${esc(f.image)}" alt="${esc(f.framing)}" loading="lazy" draggable="false" />` : `<span>${esc(f.framing)}</span>`}
+            <span class="frame-shot">${esc(f.shot)}</span>
+          </div>
+          <figcaption class="frame-info">
+            <p class="frame-framing">${esc(f.framing)} <em>${esc(f.move)}</em></p>
+            <p class="frame-text">${esc(f.text)}</p>
+          </figcaption>
+        </figure>`;
+      }).join('');
+      const end = project ? `
+        <article class="sb-card sb-end" data-chapter="${esc(sb.title)}" style="--p1:${(project.colors || [])[0]};--p2:${(project.colors || [])[1]}">
+          <button class="sb-play" type="button" data-open="${linked}">
+            <span class="sb-play-ring"><span>▶</span></span>
+            <span class="sb-play-label">Regarder le clip</span>
+            <span class="sb-play-sub">${project.video ? `${esc(project.title)}${project.duration ? ` · ${esc(project.duration)}` : ''}` : 'Le clip arrive bientôt en ligne'}</span>
+          </button>
+        </article>` : '';
+      return intro + frames + end;
+    }).join('');
+    $('#sb-total').textContent = pad(frameCount);
+    $('#sb-chapter').textContent = S.storyboards[0] ? S.storyboards[0].title : '';
 
-  /* ================= À PROPOS ================= */
-  $('#about-photo').innerHTML = S.avatar
-    ? `<div class="about-photo-inner"><img src="${esc(S.avatar)}" alt="Portrait de ${esc(fullName)}" loading="lazy" /></div><figcaption>${esc(S.city)}</figcaption>`
-    : '';
-  $('#about-bio').innerHTML = [`Moi c'est ${S.firstName}, ${S.role.toLowerCase()}.`, ...S.bio]
-    .map((b) => `<p class="reveal">${esc(b)}</p>`).join('');
-  $('#stats').innerHTML = S.stats.map((s) => `<div class="stat reveal"><div class="stat-value" data-value="${esc(s.value)}">${esc(s.value)}</div><div class="stat-label">${esc(s.label)}</div></div>`).join('');
-  const li = (arr) => arr.map((x) => `<li>${esc(x)}</li>`).join('');
-  $('#skills').innerHTML = li(S.skills);
-  $('#tools').innerHTML = li(S.tools);
-  $('#path').innerHTML = `<div class="about-col"><h3>Parcours</h3></div>` + S.path.map((p) => `
-    <div class="path-item reveal"><span class="path-year">${esc(p.year)}</span><div><h4>${esc(p.title)}</h4><p>${esc(p.text)}</p></div></div>`).join('');
+    const sbView = $('#sb-viewport');
+    const sbCards = $$('.sb-card', sbView);
+    let sbDown = null, sbDragged = false;
+    $('#sb-strip').addEventListener('click', (e) => {
+      if (sbDragged) return;
+      const pg = e.target.closest('[data-page]');
+      if (pg) openLightbox(pg.dataset.page, pg.dataset.title);
+      const open = e.target.closest('[data-open]');
+      if (open) openProject(+open.dataset.open);
+    });
+    function updateStrip() {
+      const max = sbView.scrollWidth - sbView.clientWidth;
+      $('#sb-bar').style.transform = `scaleX(${max > 0 ? sbView.scrollLeft / max : 0})`;
+      const mid = sbView.scrollLeft + sbView.clientWidth / 2;
+      let best = sbCards[0], bestD = Infinity;
+      sbCards.forEach((c) => {
+        const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+        if (d < bestD) { bestD = d; best = c; }
+      });
+      if (best) $('#sb-current').textContent = best.classList.contains('sb-end') ? 'FIN' : pad(best.dataset.n || 1);
+    }
+    let sbTick = false;
+    sbView.addEventListener('scroll', () => {
+      if (sbTick) return;
+      sbTick = true;
+      requestAnimationFrame(() => { updateStrip(); sbTick = false; });
+    }, { passive: true });
+    $$('[data-sb]').forEach((b) => b.addEventListener('click', () => {
+      const w = (sbCards[1] || sbCards[0]).offsetWidth + 18;
+      sbView.scrollBy({ left: +b.dataset.sb * w * 2, behavior: reduceMotion ? 'auto' : 'smooth' });
+    }));
+    sbView.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      sbDown = { x: e.clientX, left: sbView.scrollLeft };
+      sbDragged = false;
+    });
+    addEventListener('pointermove', (e) => {
+      if (!sbDown) return;
+      const dx = e.clientX - sbDown.x;
+      if (Math.abs(dx) > 6) { sbDragged = true; sbView.classList.add('is-drag'); }
+      if (sbDragged) sbView.scrollLeft = sbDown.left - dx;
+    });
+    addEventListener('pointerup', () => {
+      sbDown = null;
+      sbView.classList.remove('is-drag');
+      setTimeout(() => { sbDragged = false; }, 0);
+    });
+    updateStrip();
+
+    /* ================= À PROPOS ================= */
+    $('#about-photo').innerHTML = S.avatar
+      ? `<div class="about-photo-inner"><img src="${esc(S.avatar)}" alt="Portrait de ${esc(fullName)}" loading="lazy" /></div><figcaption>${esc(S.city)}</figcaption>`
+      : '';
+    $('#about-bio').innerHTML = [`Moi c'est ${S.firstName}, ${S.role.toLowerCase()}.`, S.manifesto, ...S.bio]
+      .filter(Boolean).map((b) => `<p class="reveal">${esc(b)}</p>`).join('');
+    $('#stats').innerHTML = S.stats.map((s) => `<div class="stat reveal"><div class="stat-value">${esc(s.value)}</div><div class="stat-label">${esc(s.label)}</div></div>`).join('');
+    const li = (arr) => arr.map((x) => `<li>${esc(x)}</li>`).join('');
+    $('#skills').innerHTML = li(S.skills);
+    $('#tools').innerHTML = li(S.tools);
+    $('#path').innerHTML = `<div class="about-col"><h3>Parcours</h3></div>` + S.path.map((p) => `
+      <div class="path-item reveal"><span class="path-year">${esc(p.year)}</span><div><h4>${esc(p.title)}</h4><p>${esc(p.text)}</p></div></div>`).join('');
+  }
 
   /* ================= CONTACT ================= */
   const emailLink = $('#contact-email');
-  emailLink.innerHTML = [...S.email].map((c) => `<span class="ch">${esc(c)}</span>`).join('');
-  emailLink.setAttribute('aria-label', S.email);
+  emailLink.textContent = S.email;
   emailLink.href = `mailto:${S.email}`;
   emailLink.dataset.cursor = 'Copier';
   emailLink.addEventListener('click', async (e) => {
@@ -637,7 +578,6 @@
       location.href = `mailto:${S.email}`;
     }
   });
-
   const socials = S.socials.filter((s) => s.url);
   $('#contact-info').innerHTML = `<dl>
       <dt>E-mail</dt><dd><a href="mailto:${esc(S.email)}">${esc(S.email)}</a></dd>
@@ -653,7 +593,6 @@
     const chip = e.target.closest('.chip');
     if (chip) chip.setAttribute('aria-pressed', chip.getAttribute('aria-pressed') !== 'true');
   });
-
   const form = $('#contact-form');
   const status = $('#form-status');
   form.addEventListener('submit', async (e) => {
@@ -666,10 +605,8 @@
       if (bad) ok = false;
     });
     if (!ok) { status.textContent = 'Merci de remplir ton nom, ton e-mail et ton message.'; return; }
-
     const chosen = $$('.chip[aria-pressed="true"]').map((c) => c.textContent);
     const data = { name: form.elements.name.value.trim(), email: form.elements.email.value.trim(), type: chosen.join(', '), message: form.elements.message.value.trim() };
-
     if (S.formEndpoint) {
       status.textContent = 'Envoi…';
       try {
@@ -694,37 +631,12 @@
   const fmt = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
   const updateClock = () => { clock.textContent = fmt.format(new Date()); };
   updateClock(); setInterval(updateClock, 30000);
+  ['hero', 'storyboards', 'contact'].forEach((id) => {
+    const el = document.getElementById(id);
+    watchVisible(el, (v) => el && el.classList.toggle('is-offscreen', !v));
+  });
 
-  /* ================= TIMELINE DE MONTAGE ================= */
-  // Chaque section = un clip sur la timeline ; la tête de lecture suit le scroll
-  const chapters = [['hero', 'Intro'], ['manifeste', 'Approche'], ['projets', 'Projets'], ['storyboards', 'Storyboards'], ['services', 'Services'], ['a-propos', 'À propos'], ['contact', 'Contact']];
-  const track = $('#tl-track');
-  const head = $('#tl-head');
-  const tlTc = $('#tl-tc');
-  track.innerHTML = chapters.map(([id, label], i) =>
-    `<a class="tl-clip" href="#${id}" style="--k:${i}"><span>${label}</span></a>`).join('');
-  function layoutTimeline() {
-    const total = document.documentElement.scrollHeight;
-    $$('.tl-clip', track).forEach((clip, i) => {
-      const el = document.getElementById(chapters[i][0]);
-      const next = chapters[i + 1] ? document.getElementById(chapters[i + 1][0]) : null;
-      const top = el.getBoundingClientRect().top + scrollY;
-      const end = next ? next.getBoundingClientRect().top + scrollY : total;
-      clip.style.flexGrow = Math.max(1, end - top);
-    });
-  }
-  function updateTimeline() {
-    const max = document.documentElement.scrollHeight - innerHeight;
-    const k = max > 0 ? clamp(scrollY / max, 0, 1) : 0;
-    head.style.setProperty('--p', k);
-    tlTc.textContent = toTC(Math.floor(k * 210 * 25));   // la page dure 3 min 30
-  }
-  addEventListener('resize', layoutTimeline);
-  document.addEventListener('layout:change', layoutTimeline);
-  document.addEventListener('timeline:layout', layoutTimeline);
-  addEventListener('load', layoutTimeline);
-
-  /* ================= MENU MOBILE ================= */
+  /* ================= MENU ET NAVIGATION ================= */
   const burger = $('#burger');
   const menu = $('#menu');
   function setMenu(open) {
@@ -737,7 +649,21 @@
   burger.addEventListener('click', () => setMenu(burger.getAttribute('aria-expanded') !== 'true'));
   $$('a', menu).forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
-  /* ================= CLAVIER ================= */
+  // Le menu se cache quand on descend et revient quand on remonte
+  const nav = $('#nav');
+  let lastY = 0, ticking = false;
+  function onScroll() {
+    const y = scrollY;
+    if (y < 80) nav.classList.remove('is-hidden');
+    else if (y > lastY + 6 && !menu.classList.contains('is-open')) nav.classList.add('is-hidden');
+    else if (y < lastY - 6) nav.classList.remove('is-hidden');
+    nav.classList.toggle('is-solid', y > (page === 'home' ? innerHeight * 0.6 : 60));
+    if (Math.abs(y - lastY) > 6) lastY = y;
+    ticking = false;
+  }
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
+
   addEventListener('keydown', (e) => {
     if (!lightbox.hidden && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) return stepLb(e.key === 'ArrowRight' ? 1 : -1);
     if (e.key !== 'Escape') return;
@@ -746,68 +672,18 @@
     else if (menu.classList.contains('is-open')) setMenu(false);
   });
 
-  /* ================= SHOWREEL ================= */
-  const reelBtn = $('#showreel-btn');
-  if (reelBtn) reelBtn.addEventListener('click', () => {
-    lastFocus = reelBtn;
-    $('#modal-media').innerHTML = playerHtml(S.showreel.video);
-    $('#modal-body').innerHTML = `<div><p class="eyebrow">Showreel</p><h2 id="modal-title">${esc(fullName)}</h2></div>`;
-    showModal();
-  });
+  /* ================= APPARITIONS AU SCROLL ================= */
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
+    }), { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    $$('.reveal').forEach((el) => io.observe(el));
+  } else {
+    $$('.reveal').forEach((el) => el.classList.add('is-in'));
+  }
 
-  /* ================= SCROLL ================= */
-  let ticking = false;
-  const onScroll = () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      lightWords(); updateTimeline();
-      $('#nav').classList.toggle('is-solid', scrollY > innerHeight * 0.6);
-      ticking = false;
-    });
-  };
-  addEventListener('scroll', onScroll, { passive: true });
-  layoutTimeline(); lightWords(); updateTimeline();
-
-  /* ================= CHARGEMENT ================= */
-  const loader = $('#loader');
-  const num = $('#loader-num');
-  const bar = $('#loader-bar');
-  const duration = reduceMotion || document.documentElement.classList.contains('lite') ? 0 : 1500;
-  const start = performance.now();
-  let finished = false;
-  function finish() {
-    if (finished) return;
-    finished = true;
-    document.body.classList.remove('is-loading');
-    document.body.classList.add('is-ready');
-    layoutTimeline();
-    // Lien direct vers une section (ex. index.html#contact)
+  // Lien direct vers une section (ex. index.html#contact) une fois la page construite
+  addEventListener('load', () => {
     if (location.hash) { const t = document.querySelector(location.hash); if (t) t.scrollIntoView(); }
-  }
-  (function load(now) {
-    const k = duration ? Math.min(1, (now - start) / duration) : 1;
-    const eased = 1 - Math.pow(1 - k, 3);
-    num.textContent = pad(Math.round(eased * 100));
-    bar.style.width = `${eased * 100}%`;
-    // attend (4 s maximum) les bibliothèques d'animation si elles chargent encore
-    const waiting = window.__animWait && !window.__animWait.done && now - start < 4000;
-    if (k < 1 || waiting) return requestAnimationFrame(load);
-    // anim.js remplace la sortie simple par l'ouverture du diaphragme
-    if (typeof window.__intro === 'function') {
-      try { return window.__intro(loader, finish); } catch (err) { console.error(err); }
-    }
-    plainExit();
-  })(start);
-  function plainExit() {
-    loader.classList.add('is-done');
-    finish();
-    setTimeout(() => loader.remove(), 1400);
-  }
-  // Filet de sécurité : quoi qu'il arrive, le site s'affiche
-  setTimeout(() => {
-    if (!document.body.contains(loader) && finished) return;
-    $$('.hero .ch, .hero-kicker, .hero-status, .hero-actions > *, .hero-scroll, .viewfinder *').forEach((el) => { el.style.opacity = 1; });
-    if (document.body.contains(loader)) plainExit();
-  }, 9000);
+  });
 })();

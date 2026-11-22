@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projets — Ndimby Ramahafadrahona</title>
+  <meta name="description" content="Tous les projets de Ndimby Ramahafadrahona, vidéaste freelance à Blois et Nantes." />
+  <meta name="theme-color" content="#f3eee2" />
+  <link rel="preload" href="assets/fonts/anton-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="style.css?v=202611221953" />
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body data-page="works">
+
+  <!-- Bulle du curseur (ordinateur uniquement) -->
+  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursor-label"></span></div>
+
+  <header class="nav nav-light" id="nav">
+    <a href="index.html" class="nav-logo" aria-label="Ndimby Ramahafadrahona — accueil">NR</a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="projets.html" aria-current="page">Projets</a>
+      <a href="index.html#storyboards">Storyboards</a>
+      <a href="index.html#a-propos">À propos</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="nav-burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
+  </header>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <a href="projets.html">Projets</a>
+    <a href="index.html#storyboards">Storyboards</a>
+    <a href="index.html#a-propos">À propos</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <main id="top" class="works">
+    <h1 class="works-title" id="works-title"><span id="works-word">Projets</span></h1>
+    <div class="works-bar">
+      <span class="works-count" id="works-count"></span>
+      <span class="works-hint">Fais glisser pour voir la suite →</span>
+    </div>
+
+    <div class="works-strip" id="works-strip">
+      <ul class="works-track" id="works-track"></ul>
+    </div>
+
+    <div class="works-nav">
+      <button class="round-btn round-ink" type="button" data-w="-1" aria-label="Projets précédents">←</button>
+      <div class="works-progress" aria-hidden="true"><span id="works-bar"></span></div>
+      <button class="round-btn round-ink" type="button" data-w="1" aria-label="Projets suivants">→</button>
+    </div>
+  </main>
+
+  <!-- CONTACT (le même que sur l'accueil) -->
+  <section class="contact contact-works" id="contact">
+    <div class="contact-inner">
+      <p class="mono-label">(Contact)</p>
+      <h2 class="contact-title" id="contact-title"><span class="ct-line">Un projet,</span><span class="ct-line">une idée&nbsp;?</span></h2>
+      <a class="contact-email" id="contact-email" href="#"></a>
+      <p class="contact-hint" id="copy-hint">Cliquez pour copier l'adresse</p>
+      <div class="contact-grid">
+        <div class="contact-info" id="contact-info"></div>
+        <form class="contact-form" id="contact-form" novalidate>
+          <div class="field"><label for="f-name">Nom</label><input id="f-name" name="name" required autocomplete="name" /></div>
+          <div class="field"><label for="f-email">E-mail</label><input id="f-email" name="email" type="email" required autocomplete="email" /></div>
+          <div class="field field-full">
+            <span class="field-label">Type de projet</span>
+            <div class="chips" id="chips"></div>
+          </div>
+          <div class="field field-full"><label for="f-msg">Message</label><textarea id="f-msg" name="message" rows="4" required></textarea></div>
+          <button class="btn btn-light" type="submit">Envoyer le message <span>→</span></button>
+          <p class="form-status" id="form-status" role="status"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-big" aria-hidden="true">Ndimby</div>
+    <div class="footer-row">
+      <span id="footer-copy"></span>
+      <span>Blois · Nantes — <span id="local-time">--:--</span></span>
+      <a href="#top">Retour en haut ↑</a>
+    </div>
+  </footer>
+
+  <!-- Sélecteur d'ambiance -->
+  <div class="palette" id="palette" hidden>
+    <span class="palette-label">Ambiance · <b id="palette-name"></b></span>
+    <div class="palette-swatches" id="palette-swatches"></div>
+  </div>
+
+  <!-- Fiche projet -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel">
+      <button class="modal-close" data-close aria-label="Fermer">✕</button>
+      <div class="modal-media" id="modal-media"></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Photo ou planche en grand -->
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="modal-close" data-close aria-label="Fermer">✕</button>
+    <button class="lb-nav lb-prev" type="button" data-lb="-1" aria-label="Photo précédente">←</button>
+    <img id="lightbox-img" alt="" />
+    <button class="lb-nav lb-next" type="button" data-lb="1" aria-label="Photo suivante">→</button>
+    <span class="lb-count" id="lb-count"></span>
+  </div>
+
+  <script src="contenu.js?v=202611221953"></script>
+  <script src="main.js?v=202611221953"></script>
+</body>
+</html>

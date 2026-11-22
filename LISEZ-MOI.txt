@@ -1,31 +1,36 @@
 PORTFOLIO NDIMBY — mode d'emploi
 ================================
 
-OUVRIR LE SITE
-  Double-clique sur index.html (tous les fichiers du dossier doivent rester ensemble).
-  Liens directs : index.html#projets, #storyboards, #services, #a-propos, #contact
+LES PAGES
+  index.html    l'accueil (photos autour du titre, projets sélectionnés qui défilent,
+                phrase géante, clients, storyboards, à propos, contact)
+  projets.html  tous les projets (énorme mot « PROJETS » et rangée horizontale de tuiles)
+  ancien/       l'ancien site façon bureau macOS (toujours en ligne)
 
 LES FICHIERS
-  index.html   la page
-  contenu.js   ← TOUT TON CONTENU EST ICI (c'est le seul fichier à modifier)
-  main.js      construit la page (pas besoin d'y toucher)
-  style.css    l'apparence
-  assets/      photo, CV, police, storyboards, et plus tard tes vidéos
+  contenu.js    ← TOUT TON CONTENU EST ICI (c'est le seul fichier à modifier)
+  main.js       construit les pages (pas besoin d'y toucher)
+  style.css     l'apparence (couleurs, polices, tailles)
+  assets/       photos, vignettes (mini/), CV, storyboards, polices (fonts/)
 
-AJOUTER TES VIDÉOS (dans contenu.js → projects)
-  video   : 'assets/videos/clip.mp4' ou un lien YouTube / Vimeo
-            → la vidéo se lit dans la fiche du projet.
-  preview : petit extrait MP4 muet de 3-5 s ('assets/videos/clip-apercu.mp4')
-            → joué au survol de la ligne du projet (sur ordinateur).
-  cover   : image de couverture ('assets/projets/clip.jpg')
-            → sinon une affiche colorée est générée avec les deux « colors ».
+CE QUI SE MODIFIE DANS contenu.js
+  projects      les projets (titre, année, description, vidéo YouTube, photos…)
+                video : lien YouTube / Vimeo   cover : photo de couverture
+                thumb : petite version de la photo (assets/mini/) pour les tuiles
+                galleries : plusieurs séries de photos dans la même fiche
+  heroImages    les photos qui apparaissent autour du titre de l'accueil
+                (o : p = portrait, l = paysage)
+  statement     la phrase géante : les mots { w: 'clips', p: 'clip-sae302' } sont cliquables
+                et montrent le projet « p » au survol
+  clients       la grille « Ils m'ont fait confiance » (p : projet montré au survol)
+  palette       l'ambiance par défaut : golden, teal, neon ou lagon
+                showPalettePicker: true garde le sélecteur « Ambiance » pour les visiteurs
 
-SHOWREEL
-  contenu.js → showreel: { video: 'assets/videos/showreel.mp4' }
-  La vidéo tourne en fond de l'accueil et un bouton « Voir le showreel » apparaît.
-
-RÉSEAUX SOCIAUX
-  contenu.js → socials : un réseau n'apparaît que si son lien (url) est rempli.
+AJOUTER UN PROJET
+  1. Ajoute un bloc dans « projects » (copie-en un existant).
+  2. Mets son lien YouTube dans video (la miniature YouTube sert de couverture).
+  3. Pour une photo : mets-la dans assets/projets/, indique-la dans cover,
+     et si tu peux, une version réduite (900 px) dans assets/mini/ pour thumb.
 
 RECEVOIR LES MESSAGES DIRECTEMENT
   Par défaut, le formulaire ouvre la messagerie du visiteur avec le message prêt.
@@ -33,17 +38,8 @@ RECEVOIR LES MESSAGES DIRECTEMENT
   https://formspree.io et colle son adresse dans contenu.js → formEndpoint.
 
 GARDER LE SITE RAPIDE
-  Vidéos : MP4 (H.264), 1080p max, compressées (HandBrake, préréglage « Fast 1080p30 »).
-  Extraits de survol : 720p, 3-5 secondes, sans son.
+  Photos : JPG de 1600 px au maximum. Vidéos : sur YouTube plutôt que dans le site.
 
-METTRE EN LIGNE (gratuit)
-  GitHub Pages, Netlify ou Vercel : dépose simplement le dossier.
-
-AMBIANCE DE COULEURS
-  contenu.js → palette : 'golden', 'teal', 'neon' ou 'lagon'.
-  showPalettePicker: true affiche le sélecteur « Ambiance » pour essayer en direct ;
-  mets false une fois ton choix fait.
-
-ANIMATIONS
-  anim.js utilise GSAP, ScrollTrigger et Lenis (dans assets/vendor, rien à installer).
-  Si un visiteur a demandé moins d'animations dans son système, elles sont coupées.
+ANCIEN DESIGN
+  Le design précédent (ambiance Lagon, éventail de cartes) est gardé dans l'historique Git :
+  étiquette « design-lagon-v1 ».
