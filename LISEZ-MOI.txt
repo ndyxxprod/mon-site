@@ -2,8 +2,8 @@ PORTFOLIO NDIMBY — mode d'emploi
 ================================
 
 LES PAGES
-  index.html    l'accueil (photos autour du titre, projets sélectionnés qui défilent,
-                phrase géante, clients, storyboards, à propos, contact)
+  index.html    l'accueil (photos cliquables autour du titre, projets sélectionnés qui défilent,
+                phrase géante, clients, à propos en clap de cinéma, contact)
   projets.html  tous les projets (énorme mot « PROJETS » et rangée horizontale de tuiles)
   ancien/       l'ancien site façon bureau macOS (toujours en ligne)
 
@@ -18,12 +18,12 @@ CE QUI SE MODIFIE DANS contenu.js
                 video : lien YouTube / Vimeo   cover : photo de couverture
                 thumb : petite version de la photo (assets/mini/) pour les tuiles
                 galleries : plusieurs séries de photos dans la même fiche
-  heroImages    les photos qui apparaissent autour du titre de l'accueil
-                (o : p = portrait, l = paysage)
+  heroPhotos    les 6 photos autour du titre de l'accueil (slot = leur place, p = le projet ouvert)
   statement     la phrase géante : les mots { w: 'clips', p: 'clip-sae302' } sont cliquables
                 et montrent le projet « p » au survol
   clients       la grille « Ils m'ont fait confiance » (p : projet montré au survol)
-  palette       l'ambiance par défaut : golden, teal, neon ou lagon
+  palette       l'ambiance par défaut : lagon, golden, neon ou teal
+                chaque ambiance change tout le site (fonds, textes, couleurs)
                 showPalettePicker: true garde le sélecteur « Ambiance » pour les visiteurs
 
 AJOUTER UN PROJET

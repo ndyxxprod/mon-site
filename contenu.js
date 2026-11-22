@@ -25,19 +25,19 @@ const SITE = {
   avatar: 'assets/avatar.jpg',
   cv: 'assets/cv.pdf?v=202611041451',
 
-  /* AMBIANCE DE COULEURS
-     palette : celle affichée par défaut (golden, teal, neon ou lagon).
-     showPalettePicker : true = petit sélecteur « Ambiance » en bas à droite pour
-     essayer les palettes en direct. Mets false une fois ton choix fait.
-     c1 / c2 : couleurs principales (fond animé de l'accueil, dégradés, contact)
-     c3 : couleur claire (section Services)                                     */
+  /* AMBIANCE DE COULEURS — chaque ambiance change TOUT le site
+     palette : celle affichée par défaut (lagon, golden, neon ou teal).
+     showPalettePicker : true = petit sélecteur « Ambiance » pour les visiteurs.
+     bg / bg2 : fonds sombres   fg : texte sur fond sombre
+     paper : fond clair   ink : texte sur fond clair
+     c1 / c2 / c3 : couleurs vives (boutons, survols, dégradés)                  */
   palette: 'lagon',
   showPalettePicker: true,
   palettes: {
-    golden: { name: 'Golden hour', c1: '#ff5a1f', c2: '#ff1f6d', c3: '#ffb627' },
-    teal:   { name: 'Teal & Orange', c1: '#ff7a1a', c2: '#00a3a3', c3: '#ffd6a5' },
-    neon:   { name: 'Néon', c1: '#8b3dff', c2: '#ff2bd6', c3: '#2ee6ff' },
-    lagon:  { name: 'Lagon', c1: '#00b89c', c2: '#2563eb', c3: '#8ff7da' }
+    lagon:  { name: 'Lagon',         bg: '#04122a', bg2: '#08234a', fg: '#e6f6ff', paper: '#cfe8ff', ink: '#06183a', c1: '#00d4b4', c2: '#2f6bff', c3: '#8ff7da' },
+    golden: { name: 'Golden hour',   bg: '#1c0d07', bg2: '#31160a', fg: '#fff0dc', paper: '#ffd9a0', ink: '#2b1206', c1: '#ff5a1f', c2: '#ff1f6d', c3: '#ffb627' },
+    neon:   { name: 'Néon',          bg: '#0a0518', bg2: '#190a38', fg: '#f4eaff', paper: '#d9c2ff', ink: '#1b0b3d', c1: '#a24bff', c2: '#ff2bd6', c3: '#2ee6ff' },
+    teal:   { name: 'Teal & Orange', bg: '#061c22', bg2: '#0c3039', fg: '#fdeedd', paper: '#f6d3ac', ink: '#14282d', c1: '#ff7a1a', c2: '#00a3a3', c3: '#ffd6a5' }
   },
 
   /* Showreel : laisse null tant que tu n'en as pas.
@@ -60,32 +60,24 @@ const SITE = {
     { network: 'LinkedIn', url: 'https://www.linkedin.com/in/ndimby-ramahafadrahona-b9420635a/' }
   ],
 
-  /* ACCUEIL — photos qui apparaissent autour du titre (o : p = portrait, l = paysage) */
+  /* ACCUEIL */
   heroLines: ['Ndimby', 'Vidéaste', 'Freelance'],
-  heroImages: [
-    { src: 'assets/mini/mariage-02.jpg', o: 'p' },
-    { src: 'assets/mini/mariage-11.jpg', o: 'p' },
-    { src: 'assets/mini/mariage-12.jpg', o: 'p' },
-    { src: 'assets/mini/mariage-04.jpg', o: 'l' },
-    { src: 'assets/mini/mariage-05.jpg', o: 'l' },
-    { src: 'assets/mini/mariage-07.jpg', o: 'l' },
-    { src: 'assets/mini/tolotra-01.jpg', o: 'p' },
-    { src: 'assets/mini/tolotra-02.jpg', o: 'p' },
-    { src: 'assets/mini/tolotra-03.jpg', o: 'l' },
-    { src: 'assets/mini/tolotra-04.jpg', o: 'p' },
-    { src: 'assets/mini/tolotra-06.jpg', o: 'p' },
-    { src: 'assets/mini/tolotra-07.jpg', o: 'l' },
-    { src: 'assets/mini/tolotra-10.jpg', o: 'p' },
-    { src: 'assets/mini/intercampus-portrait.jpg', o: 'p' },
-    { src: 'assets/mini/clip-cover.jpg', o: 'l' }
+  /* Photos autour du titre : une par projet, cliquables (bulle « Voir »).
+     slot : f1 à f6 (leur place)   p : le projet ouvert   img : la photo (sinon la couverture du projet) */
+  heroPhotos: [
+    { slot: 'f1', p: 'mariage', img: 'assets/mini/mariage-11.jpg' },
+    { slot: 'f2', p: 'mariage', img: 'assets/mini/tolotra-04.jpg' },
+    { slot: 'f3', p: 'clip-sae302', img: 'assets/mini/clip-cover.jpg' },
+    { slot: 'f4', p: 'ufab' },
+    { slot: 'f5', p: 'intercampus', img: 'assets/mini/intercampus-portrait.jpg' },
+    { slot: 'f6', p: 'harmonya' }
   ],
 
   /* Phrase géante : les mots en couleur sont cliquables et montrent un projet au survol.
      w = le mot, p = l'identifiant du projet montré. */
   statement: [
-    'Je filme des ', { w: 'clips', p: 'clip-sae302' }, ', des ', { w: 'publicités', p: 'harmonya' },
-    ', des ', { w: 'soirées', p: 'intercampus' }, ', du ', { w: 'sport', p: 'ufab' },
-    ' et des films de ', { w: 'sensibilisation', p: 'autisme' }, '. Je photographie des ', { w: 'mariages', p: 'mariage' }, '.'
+    'Je filme des ', { w: 'clips', p: 'clip-sae302' }, ', des ', { w: 'soirées', p: 'intercampus' },
+    ' et du ', { w: 'sport', p: 'ufab' }, '. Je peux aussi ', { w: 'photographier', p: 'mariage' }, '.'
   ],
 
   /* Ils m'ont fait confiance : p = projet montré au survol, img = photo (facultatif) */
@@ -93,7 +85,6 @@ const SITE = {
     { name: 'UFAB 49', kind: 'Club de basket pro', p: 'ufab' },
     { name: 'The Banshee', kind: 'Groupe de musique', p: 'clip-sae302' },
     { name: 'Fédération des étudiants de Blois', kind: 'Association', p: 'intercampus' },
-    { name: 'BUT MMI · IUT de Blois', kind: 'Projets d\'études', p: 'harmonya' },
     { name: 'Haja & Nancy', kind: 'Mariage · 2026', p: 'mariage', img: 'assets/mini/mariage-02.jpg' },
     { name: 'Tolotra & Diana', kind: 'Mariage · 2026', p: 'mariage', img: 'assets/mini/tolotra-04.jpg' }
   ],
@@ -102,7 +93,7 @@ const SITE = {
   manifesto: "Passionné par les caméras depuis tout petit, j'ai toujours eu envie de tout capturer : les moments, les gens, les ambiances.",
 
   // Bandeau qui défile
-  marquee: ['Vidéo promotionnelle', 'Événementiel', 'Réseaux sociaux', 'Storyboard', 'Clip musical', 'Photographie'],
+  marquee: ['Vidéo promotionnelle', 'Événementiel', 'Réseaux sociaux', 'Clip musical', 'Photographie'],
 
   bio: [
     "Aujourd'hui étudiant en BUT MMI (parcours communication) à l'IUT de Blois, je développe mon activité de vidéaste freelance en parallèle de mes études.",
@@ -125,8 +116,7 @@ const SITE = {
     'Tournage et prise de vue',
     'Montage vidéo et postproduction',
     'Contenus pour les réseaux sociaux',
-    'Photographie événementielle',
-    'Storyboard et découpage'
+    'Photographie événementielle'
   ],
 
   tools: ['DaVinci Resolve', 'After Effects', 'CapCut Pro', 'Photoshop', 'Lightroom', 'Illustrator', 'Canva'],
@@ -143,7 +133,8 @@ const SITE = {
     /* videos : plusieurs vidéos dans la même fiche (la première sert de couverture) */
     { id: 'ufab', title: 'UFAB 49 — Angers Basket', short: 'UFAB 49', category: 'pro', type: 'Vidéo',
       client: 'UFAB 49 — Union Féminine Angers Basket', year: '2025-26', role: 'Tout, du tournage au rendu final', duration: '',
-      description: "Deux vidéos réalisées pour l'UFAB 49, le club professionnel de basket féminin d'Angers : un teaser pour promouvoir le prochain match de l'équipe, puis l'introduction du documentaire consacré à la victoire des U18 en Coupe de France. J'ai pris en charge les deux vidéos de A à Z, du tournage au montage jusqu'au rendu final.",
+      description: "Deux vidéos pour l'UFAB 49, le club professionnel de basket féminin d'Angers : le teaser du prochain match, puis l'introduction du documentaire sur la victoire des U18 en Coupe de France.",
+      kind: 'Vidéos pour un club pro',
       tags: ['Sport', 'Basket', 'Club pro'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/HxsINV4s5Nc',
       videos: [
@@ -154,15 +145,17 @@ const SITE = {
 
     { id: 'clip-sae302', title: 'Clip musical', short: 'Clip musical', category: 'scolaire', type: 'Vidéo',
       client: 'The Banshee — projet BUT MMI, IUT de Blois', year: '2025', role: 'Réalisateur, chef de production, cadreur', duration: '5:27',
-      description: "Clip réalisé dans le cadre d'un projet de l'IUT, mais pour un vrai client : le groupe The Banshee. J'en étais le réalisateur et le chef de production : j'ai assuré seul tout le tournage, puis supervisé la post-production en échangeant avec le monteur, le directeur artistique et l'étalonneur. Pendant que le groupe joue, une jeune fille suit une silhouette jusque dans la forêt. Tournage au stabilisateur DJI, à la magic arm et sur trépied, avec des ralentis et des plans en low shutter speed.",
-      tags: ['Clip', 'Musique', 'Client réel'], tools: [], storyboard: 'sb-clip',
+      description: "Un clip pour le groupe The Banshee, réalisé dans le cadre d'un projet de l'IUT, mais pour un vrai client. J'étais réalisateur et chef de production : j'ai tout tourné moi-même, puis supervisé le montage, la direction artistique et l'étalonnage.",
+      kind: 'The Banshee',
+      tags: ['Clip', 'Musique', 'Client réel'], tools: [],
       video: 'https://youtu.be/x39LFhQWqGU',   // le clip (lien YouTube / Vimeo, ou 'assets/videos/clip.mp4')
       preview: '', cover: 'assets/projets/clip/clip-cover.jpg', thumb: 'assets/mini/clip-cover.jpg', colors: ['#3a1c71', '#d76d77'] },
 
 
     { id: 'mariage', title: 'Mariages', short: 'Mariages', category: 'pro', type: 'Photo',
       client: 'Haja & Nancy · Tolotra & Diana', year: '2026', role: 'Photographie, retouche', duration: '',
-      description: "Reportages photo de deux mariages célébrés en 2026, ceux de Haja & Nancy et de Tolotra & Diana : les préparatifs, la cérémonie, les portraits des mariés, les invités et la réception, puis tri et retouche des séries dans Lightroom.",
+      description: "Deux mariages photographiés en 2026, ceux de Haja & Nancy et de Tolotra & Diana : les préparatifs, la cérémonie, les portraits et la réception.",
+      kind: 'Reportage photo',
       tags: ['Mariage', 'Événementiel'], tools: ['Lightroom'],
       video: '', preview: '',
       thumb: 'assets/mini/mariage-02.jpg',
@@ -200,60 +193,35 @@ const SITE = {
       colors: ['#c79081', '#dfa579'] },
     { id: 'intercampus', title: 'Aftermovie Intercampus', short: 'Intercampus', category: 'pro', type: 'Vidéo',
       client: 'Fédération des étudiants de Blois', year: '2025-26', role: 'Tournage, montage', duration: '',
-      description: "Aftermovie de la soirée Intercampus. La mission : capturer l'ambiance et la festivité de l'événement, puis les retracer dans une vidéo rythmée qui fait revivre la soirée du début à la fin.",
+      description: "L'aftermovie de la soirée Intercampus : capturer l'ambiance et la fête, puis les raconter dans une vidéo rythmée.",
+      kind: 'Soirée étudiante',
       tags: ['Aftermovie', 'Événementiel', 'Soirée'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/vIWecsF3SrU', preview: '', cover: 'assets/projets/intercampus/cover-portrait.jpg', thumb: 'assets/mini/intercampus-portrait.jpg',   // image verticale (remplit toute la carte)
-      coverHasTitle: true,   // l'image contient déjà le titre : on ne le répète pas sur la carte
       colors: ['#7b2ff7', '#f107a3'] },
 
 
 
     { id: 'harmonya', title: 'Publicité Harmonya', short: 'Harmonya', category: 'scolaire', type: 'Vidéo',
       client: 'BUT MMI — IUT de Blois (1re année)', year: '2025', role: 'Tournage, montage', duration: '',
-      description: "Projet de première année du BUT MMI : il fallait inventer un monde virtuel, Harmonya, puis le promouvoir à travers une vidéo publicitaire.",
+      description: "Un projet de première année du BUT MMI : inventer un monde virtuel, Harmonya, et le promouvoir dans une vidéo publicitaire.",
+      kind: 'Film publicitaire',
       tags: ['Publicité', 'Monde virtuel'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/qoHD0Qa0w3o', preview: '', cover: '', colors: ['#2c3e50', '#c94b4b'] },
     { id: 'autisme', title: "Comprendre l'autisme", short: "Comprendre l'autisme", category: 'scolaire', type: 'Vidéo',
       client: 'BUT MMI — IUT de Blois (2e année)', year: '2025-26', role: "Toute la vidéo, de l'écriture au montage", duration: '',
-      description: "Vidéo de sensibilisation réalisée en deuxième année de BUT MMI. L'enjeu : expliquer l'autisme au grand public de façon claire et accessible, sans jargon. J'ai mené le projet de bout en bout, de l'écriture du script au montage final, en construisant un récit simple et un rythme qui laissent toute la place au message.",
+      description: "Une vidéo pour expliquer l'autisme au grand public, simplement et sans jargon. Réalisée de A à Z, de l'écriture au montage, en deuxième année de BUT MMI.",
+      kind: 'Film de sensibilisation',
       tags: ['Sensibilisation', 'Pédagogie'], tools: ['DaVinci Resolve'],
       video: 'https://youtu.be/DSiDXvcQu5U', preview: '', cover: '', colors: ['#1e3c72', '#2a9d8f'] },
 
 
     { id: 'youtube', title: 'Ma chaîne YouTube', short: 'YouTube', category: 'pro', type: 'Vidéo',
       client: 'Projet personnel — @ndyxx_mp4', year: '2025', role: 'Conception, tournage, montage', duration: '',
-      description: "Ma chaîne YouTube, @ndyxx_mp4 : un espace où je publie mes propres créations, que je conçois, tourne et monte moi-même, jusqu'aux miniatures.",
+      description: "Ma chaîne YouTube : mes créations personnelles, que je conçois, tourne et monte moi-même, jusqu'aux miniatures.",
+      kind: '@ndyxx_mp4',
       tags: ['YouTube', 'Création de contenu'], tools: ['DaVinci Resolve', 'Photoshop'],
       link: { label: 'Voir la chaîne YouTube', url: 'https://www.youtube.com/@ndyxx_mp4' },
       video: '', preview: '', cover: '', colors: ['#f12711', '#f5af19'] }
   ],
 
-  /* STORYBOARDS — une case par plan. Sans image, la case affiche juste le cadrage.
-     project : id du projet lié. La dernière carte « Regarder le clip » lit la
-     vidéo de ce projet (champ video du projet, ex. lien YouTube). */
-  storyboards: [
-    {
-      id: 'sb-clip', title: 'Clip musical', project: 'clip-sae302', date: '2025',
-      page: 'assets/storyboards/clip-sae302-planche.jpg',
-      description: "Découpage du clip minute par minute : le groupe joue pendant qu'une jeune fille suit une silhouette jusque dans la forêt. Chaque plan précise le cadrage et le support caméra (DJI, magic arm, trépied, main).",
-      frames: [
-        { image: 'assets/storyboards/clip-01.jpg', shot: '00:00', framing: 'Ouverture', move: 'iPhone sur magic arm', text: "Premier plan, lancement de la vidéo : le guitariste et le batteur entrent en scène." },
-        { image: 'assets/storyboards/clip-02.jpg', shot: '00:00', framing: 'Plan à 45°', move: 'DJI, travelling avant', text: "Dès que le batteur joue ses premières notes, la caméra avance petit à petit vers lui." },
-        { image: 'assets/storyboards/clip-04.jpg', shot: '00:00', framing: 'Top down shot', move: 'Trépied', text: "La batterie vue du dessus pendant ses breaks." },
-        { image: 'assets/storyboards/clip-05.jpg', shot: '00:31', framing: 'Top down shot', move: 'Trépied', text: "Le subconscient du protagoniste ouvre les yeux." },
-        { image: 'assets/storyboards/clip-06.jpg', shot: '00:31', framing: 'Plan large', move: 'DJI, travelling bas', text: "Il voit une silhouette passer devant la fenêtre, se lève et commence à errer dans la rue en la suivant." },
-        { image: 'assets/storyboards/clip-07.jpg', shot: '01:03', framing: 'Plan de groupe', move: 'DJI, travelling', text: "Le plan commence sur la violoniste ; quand le chanteur dit « Wander », la caméra passe sur lui." },
-        { image: '', shot: '01:24', framing: 'Travelling horizontal', move: 'Caméra à la main', text: "La petite fille arrive devant la forêt et suit calmement la silhouette entre les arbres." },
-        { image: '', shot: '01:41', framing: 'Close-up, ralenti', move: 'Caméra à la main', text: "Ralentis sur les yeux, les mains, les pieds. Elle perd la trace de la silhouette." },
-        { image: 'assets/storyboards/clip-10.jpg', shot: '02:10', framing: 'Profil', move: 'Magic arm puis trépied', text: "La violoniste à la magic arm, puis le chanteur de profil sur trépied." },
-        { image: 'assets/storyboards/clip-11.jpg', shot: '02:50', framing: 'Low shutter speed', move: 'Trépied tenu par le perso', text: "La protagoniste panique de ne plus retrouver la silhouette : plans en low shutter speed et ralenti." },
-        { image: 'assets/storyboards/clip-12.jpg', shot: '03:05', framing: 'Superposition', move: 'Magic arm', text: "Plan du chanteur, puis superposition progressive du plan du bassiste." },
-        { image: 'assets/storyboards/clip-13.jpg', shot: '03:19', framing: 'Gros plan', move: 'Magic arm', text: "Le bassiste seul jusqu'à 3:33." },
-        { image: 'assets/storyboards/clip-14.jpg', shot: '03:33', framing: 'Superposition', move: 'Magic arm', text: "Le violoniste jusqu'à 3:49, puis un plan du batteur en superposition." },
-        { image: 'assets/storyboards/clip-15.jpg', shot: '04:03', framing: 'Close-up puis large', move: 'DJI puis main', text: "La petite au pied de l'arbre ; elle relève la tête, se retourne et commence à courir." },
-        { image: 'assets/storyboards/clip-16.jpg', shot: '04:35', framing: 'Face à face', move: 'DJI', text: "Elle arrive enfin à sa hauteur : ils sont face à face. La scène du câlin se superpose au groupe." },
-        { image: '', shot: '05:06', framing: 'Plan de fin', move: 'Plans rapprochés', text: "Fin sur le groupe et quelques plans rapprochés." }
-      ]
-    }
-  ]
 };
