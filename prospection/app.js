@@ -114,7 +114,21 @@ function load() {
   } catch (e) { memoryOnly = true; }
   const d = blankDb(); d.prospects = demo(); return d;
 }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { memoryOnly = true; } }
+/* ---------- sauvegarde en ligne (dépôt GitHub privé) ---------- */
+const SYNC_KEY = 'ndy-prospection-sync';
+const SYNC_FILE = 'prospection.json';
+let sync = null;
+try { sync = JSON.parse(localStorage.getItem(SYNC_KEY)) || null; } catch (e) { sync = null; }
+if (sync && !sync.token) sync = null;
+const saveSyncCfg = () => { try { if (sync) localStorage.setItem(SYNC_KEY, JSON.stringify(sync)); else localStorage.removeItem(SYNC_KEY); } catch (e) { } };
+let localVer = 0, applyingRemote = false, syncBusy = false, syncTimer = null, syncMsg = '';
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { memoryOnly = true; }
+  if (applyingRemote) return;
+  localVer++;
+  if (sync) { sync.dirty = true; saveSyncCfg(); setSyncState('dirty'); scheduleSync(); }
+}
 
 function demo() {
   const t = today(); const d = n => addDays(t, n);
@@ -487,7 +501,27 @@ function viewSettings() {
         <div class="field-inline"><label for="s-delay">Relancer après</label><input id="s-delay" type="number" min="1" max="60" value="${db.settings.delay}" data-setting="delay" /> <span class="muted">jours sans réponse</span></div>
         <p class="note">Ce délai pré-remplit la date de la prochaine relance quand tu enregistres un message. Rien n’est jamais envoyé automatiquement : c’est toi qui envoies, puis tu notes l’action ici.</p>
       </section>
-      <section class="card"><h2>Sauvegarde</h2>
+      <section class="card"><h2>Sauvegarde en ligne <small>GitHub privé</small></h2>
+        ${sync ? `
+        <p class="note" style="margin-top:0">Connecté au dépôt <b>${esc(sync.repo)}</b>. Chaque modification est envoyée automatiquement et retrouvée sur tes autres appareils.</p>
+        <p class="note">État : <b>${esc($('#sync-state') ? $('#sync-state').textContent : '')}</b></p>
+        <div class="set-actions"><button class="btn primary" data-act="sync-now">Synchroniser maintenant</button><button class="btn danger" data-act="sync-off">Désactiver</button></div>
+        <p class="note">Le jeton est gardé uniquement dans ce navigateur (jamais dans les sauvegardes .json).</p>` : `
+        <p class="note" style="margin-top:0">Enregistre tes prospects dans un dépôt GitHub <b>privé</b> pour les retrouver sur tous tes appareils.</p>
+        <label class="field-inline" style="flex-direction:column;align-items:stretch;gap:4px"><span class="muted" style="font-size:12px;font-weight:600">Dépôt privé</span><input id="sync-repo" value="ndyxxprod/prospection-donnees" autocapitalize="off" autocomplete="off" /></label>
+        <label class="field-inline" style="flex-direction:column;align-items:stretch;gap:4px"><span class="muted" style="font-size:12px;font-weight:600">Jeton d’accès</span><input id="sync-token" type="password" placeholder="github_pat_…" autocapitalize="off" autocomplete="off" /></label>
+        <div class="set-actions"><button class="btn primary" data-act="sync-connect">Connecter</button></div>
+        <details style="margin-top:12px"><summary class="link" style="cursor:pointer">Comment obtenir le dépôt et le jeton ?</summary>
+          <ol class="note" style="padding-left:18px;line-height:1.6">
+            <li>Sur github.com, clique sur <b>+</b> (en haut à droite) puis <b>New repository</b>.</li>
+            <li>Nom : <b>prospection-donnees</b>. Choisis <b>Private</b>. Coche <b>Add a README file</b>. Clique <b>Create repository</b>.</li>
+            <li>Clique sur ta photo de profil → <b>Settings</b> → tout en bas <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li>
+            <li>Nom : <b>prospection</b>. Expiration : la plus longue proposée. <b>Only select repositories</b> → choisis <b>prospection-donnees</b>.</li>
+            <li><b>Permissions → Repository permissions → Contents → Read and write</b>.</li>
+            <li>Clique <b>Generate token</b>, copie le jeton (il n’apparaît qu’une fois) et colle-le ci-dessus.</li>
+          </ol></details>`}
+      </section>
+      <section class="card"><h2>Sauvegarde sur fichier</h2>
         <p class="note" style="margin-top:0">Tes données sont enregistrées <b>dans ce navigateur</b> (ni sur GitHub, ni en ligne). Fais une sauvegarde de temps en temps, et pour passer d’un appareil à l’autre.</p>
         <div class="set-actions">
           <button class="btn primary" data-act="exportjson">Exporter la sauvegarde (.json)</button>
@@ -759,6 +793,9 @@ document.addEventListener('click', e => {
     case 'exportjson': exportJson(); break;
     case 'importjson': $('#file-import').click(); break;
     case 'cleardemo': if (confirm('Supprimer les prospects de démonstration ?')) { db.prospects = db.prospects.filter(p => !p.demo); save(); render(); toast('Démo supprimée'); } break;
+    case 'sync-connect': connectSync(); break;
+    case 'sync-now': syncNow(true); break;
+    case 'sync-off': if (confirm('Désactiver la sauvegarde en ligne sur cet appareil ? (Tes données en ligne restent dans le dépôt GitHub.)')) { sync = null; saveSyncCfg(); setSyncState('off'); render(); toast('Sauvegarde en ligne désactivée'); } break;
     case 'resetall': if (confirm('Tout effacer (prospects et réglages) ? Cette action est définitive.') && confirm('Vraiment tout effacer ?')) { db = blankDb(); save(); render(); toast('Tout est effacé'); } break;
     case 'followup': openProspect(id, { action: 'followup' }); break;
     case 'firstcontact': openProspect(id, { action: 'first' }); break;
@@ -828,10 +865,121 @@ document.addEventListener('drop', e => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer(); });
 window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (VIEW_TITLES[v] && v !== ui.view) { ui.view = v; render(); } });
 
+/* ---------- synchronisation GitHub ---------- */
+const b64 = t => btoa(unescape(encodeURIComponent(t)));
+const unb64 = b => decodeURIComponent(escape(atob(b.replace(/\s/g, ''))));
+function ghFetch(path, opt) {
+  opt = opt || {};
+  return fetch('https://api.github.com/repos/' + sync.repo + path, Object.assign({}, opt, {
+    cache: 'no-store',
+    headers: Object.assign({ Authorization: 'Bearer ' + sync.token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }, opt.headers || {})
+  }));
+}
+function syncError(e) {
+  if (e && e.status === 401) return 'Jeton refusé ou expiré';
+  if (e && (e.status === 403 || e.status === 404)) return 'Accès refusé ou dépôt introuvable';
+  if (e && e.status) return 'Erreur GitHub (' + e.status + ')';
+  return 'Pas de connexion';
+}
+const httpErr = r => { const e = new Error('http'); e.status = r.status; return e; };
+function setSyncState(state, msg) {
+  syncMsg = msg || '';
+  const el = $('#sync-state'); if (!el) return;
+  const hm = sync && sync.last ? new Date(sync.last).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+  el.className = 'sync ' + (sync ? state : 'off');
+  el.textContent = !sync ? '☁ Sauvegarde en ligne : non activée'
+    : state === 'busy' ? '⟳ Synchronisation…'
+    : state === 'dirty' ? '● Modifications en cours d’envoi…'
+    : state === 'err' ? '⚠ ' + msg
+    : state === 'conflict' ? '⚠ Conflit : ouvre Réglages'
+    : '☁ Sauvegardé en ligne' + (hm ? ' · ' + hm : '');
+}
+async function remoteGet() {
+  const r = await ghFetch('/contents/' + SYNC_FILE);
+  if (r.status === 404) return null;
+  if (!r.ok) throw httpErr(r);
+  const j = await r.json();
+  let text;
+  if (j.content) text = unb64(j.content);
+  else { const r2 = await ghFetch('/contents/' + SYNC_FILE, { headers: { Accept: 'application/vnd.github.raw' } }); if (!r2.ok) throw httpErr(r2); text = await r2.text(); }
+  const parsed = JSON.parse(text);
+  return { sha: j.sha, data: parsed.data || parsed };
+}
+async function remotePut() {
+  const ver = localVer;
+  const body = { message: 'Sauvegarde ' + new Date().toISOString().slice(0, 16).replace('T', ' '), content: b64(JSON.stringify({ app: 'prospection-ndyxx', savedAt: new Date().toISOString(), data: db })) };
+  if (sync.sha) body.sha = sync.sha;
+  const r = await ghFetch('/contents/' + SYNC_FILE, { method: 'PUT', body: JSON.stringify(body) });
+  if (!r.ok) throw httpErr(r);
+  const j = await r.json();
+  sync.sha = j.content.sha; sync.last = Date.now(); sync.dirty = (ver !== localVer); saveSyncCfg();
+}
+function normalizeDb(d) {
+  d.statuses = d.statuses && d.statuses.length ? d.statuses : DEFAULT_STATUSES.map(x => ({ ...x }));
+  d.settings = Object.assign({ delay: 4, lastExport: '' }, d.settings);
+  d.prospects.forEach(p => { p.actions = p.actions || []; });
+  return d;
+}
+function adoptRemote(rem) {
+  applyingRemote = true; db = normalizeDb(rem.data); save(); applyingRemote = false;
+  sync.sha = rem.sha; sync.dirty = false; sync.last = Date.now(); saveSyncCfg();
+  if (ui.openId && !db.prospects.some(p => p.id === ui.openId)) { ui.openId = null; ui.form = null; $('#drawer').hidden = true; document.body.classList.remove('noscroll'); }
+  render(); if (ui.openId) renderDrawer();
+}
+function scheduleSync() { clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow(), 2500); }
+async function syncNow(manual) {
+  if (!sync) return;
+  if (syncBusy) { scheduleSync(); return; }
+  syncBusy = true; setSyncState('busy');
+  try {
+    const rem = await remoteGet();
+    if (!rem) { sync.sha = ''; await remotePut(); }
+    else if (rem.sha === sync.sha) { if (sync.dirty) await remotePut(); }
+    else if (!sync.dirty && sync.sha) {
+      if (ui.openId && !manual) { setSyncState('ok'); syncBusy = false; return; }
+      adoptRemote(rem); toast('Données mises à jour depuis GitHub');
+    } else {
+      /* données différentes en ligne ET sur cet appareil */
+      const n = (rem.data.prospects || []).length;
+      if (confirm(`Des données existent déjà en ligne (${n} prospect${n > 1 ? 's' : ''}).\n\nOK = utiliser les données EN LIGNE (celles de cet appareil seront remplacées).\nAnnuler = garder celles de CET APPAREIL.`)) adoptRemote(rem);
+      else if (confirm('Écraser les données en ligne par celles de cet appareil ?')) { sync.sha = rem.sha; await remotePut(); }
+      else { setSyncState('conflict'); syncBusy = false; return; }
+    }
+    if (sync.dirty) scheduleSync();
+    setSyncState('ok');
+  } catch (e) {
+    if (e && (e.status === 409 || e.status === 422)) { sync.sha = ''; saveSyncCfg(); setSyncState('err', 'Conflit, nouvelle tentative…'); setTimeout(() => syncNow(), 1500); }
+    else setSyncState('err', syncError(e));
+  } finally {
+    syncBusy = false;
+    if (ui.view === 'settings' && !(document.activeElement && document.activeElement.matches && document.activeElement.matches('input'))) render();
+  }
+}
+async function connectSync() {
+  const repoIn = $('#sync-repo').value.trim().replace(/^https?:\/\/github\.com\//i, '').replace(/\.git$/i, '').replace(/\/$/, '');
+  const token = $('#sync-token').value.trim();
+  if (!/^[\w.-]+\/[\w.-]+$/.test(repoIn)) { toast('Dépôt : écris-le sous la forme ton-nom/nom-du-depot'); return; }
+  if (!token) { toast('Colle ton jeton d’accès'); return; }
+  const prev = sync; sync = { repo: repoIn, token, sha: '', dirty: true, last: 0 };
+  setSyncState('busy');
+  try {
+    const r = await ghFetch('');
+    if (!r.ok) throw httpErr(r);
+    const j = await r.json();
+    if (j.private === false) { sync = prev; setSyncState('ok'); toast('Ce dépôt est PUBLIC : crée un dépôt privé'); render(); return; }
+    if (j.permissions && j.permissions.push === false) { sync = prev; setSyncState('ok'); toast('Le jeton n’a pas le droit d’écrire (Contents : Read and write)'); render(); return; }
+  } catch (e) { sync = prev; setSyncState(prev ? 'ok' : 'off'); toast(syncError(e)); render(); return; }
+  saveSyncCfg(); render(); await syncNow(true);
+  if (sync && sync.last) toast('Sauvegarde en ligne activée');
+}
+
 /* ---------- démarrage ---------- */
 db = load();
-save();
+try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { memoryOnly = true; }
 const h = location.hash.slice(1); if (VIEW_TITLES[h]) ui.view = h;
 render();
+setSyncState(sync && sync.dirty ? 'dirty' : 'ok');
+if (sync) syncNow();
+document.addEventListener('visibilitychange', () => { if (!document.hidden && sync) syncNow(); });
 window.__crm = { get db() { return db; }, derive, computeStats };
 })();

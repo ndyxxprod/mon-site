@@ -253,3 +253,11 @@ body.noscroll{overflow:hidden}
   .st-row{grid-template-columns:40px 1fr auto}
   .st-row select{grid-column:2}
 }
+
+.top-r{display:flex;align-items:center;gap:10px;min-width:0}
+.sync{border:0;background:none;font-size:12.5px;color:var(--muted);padding:4px 8px;border-radius:99px;text-align:right}
+.sync:hover{background:var(--card2)}
+.sync.ok{color:var(--ok)}
+.sync.err,.sync.conflict{color:var(--late)}
+.sync.dirty,.sync.busy{color:var(--today)}
+@media (max-width:900px){.sync{font-size:11px;max-width:150px;line-height:1.2}}
